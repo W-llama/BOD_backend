@@ -23,7 +23,7 @@ public class UserServiceImpl {
 	@Value("${JWT_SECRET_KEY}")
 	String secretKey;
 
-	public void signUp(SignUpRequestDto signUpRequestDto) {
+	public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
 
 		if (userRepository.existsByEmail(signUpRequestDto.getEmail())) {
 			throw new GlobalException(ErrorCode.DUPLICATE_EMAIL);
@@ -41,6 +41,7 @@ public class UserServiceImpl {
 			.build();
 
 		userRepository.save(user);
+		return new UserResponseDto(user);
 	}
 
 	private UserRole determineUserRole(SignUpRequestDto signUpRequestDto) {
