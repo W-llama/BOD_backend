@@ -25,6 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+application-secret.properties
+
 
 ### NetBeans ###
 /nbproject/private/
@@ -37,4 +39,4 @@ out/
 .vscode/
 
 ###application-secret###
-application-secret.properties
+#application-secret.properties
