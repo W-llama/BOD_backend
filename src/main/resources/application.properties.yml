@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: BOD
-  profiles:
-    include: secret
