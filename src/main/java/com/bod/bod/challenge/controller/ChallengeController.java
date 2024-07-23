@@ -39,5 +39,11 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/challenges")
+    public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenges(@RequestParam(value = "page", defaultValue = "1") int page) {
+        List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(page - 1);
+        CommonResponseDto<List<ChallengeSummaryResponseDto>> response = new CommonResponseDto<>("챌린지 전체 조회 성공", challengeList);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
 }

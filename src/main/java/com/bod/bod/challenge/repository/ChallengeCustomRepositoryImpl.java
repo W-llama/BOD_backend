@@ -35,4 +35,18 @@ public class ChallengeCustomRepositoryImpl implements ChallengeCustomRepository 
 	return challengeList;
   }
 
+  public List<ChallengeSummaryResponseDto> getChallengeList(int page) {
+	QChallenge challenge = QChallenge.challenge;
+	Pageable pageable = PageRequest.of(page, PAGE_SIZE);
+
+	List<ChallengeSummaryResponseDto> challengeList = queryFactory
+		.select(Projections.constructor(ChallengeSummaryResponseDto.class, challenge))
+		.from(challenge)
+		.orderBy(challenge.createdAt.desc())
+		.offset(pageable.getOffset())
+		.limit(pageable.getPageSize())
+		.fetch();
+	return challengeList;
+  }
+
 }
