@@ -11,13 +11,17 @@ public enum ErrorCode {
 
     ACCESS_DENIED(403, "접근 권한이 없습니다."),
     ALREADY_NICKNAME(401, "해당 닉네임은 존재하는 닉네임입니다."),
+    ALREADY_USERNAME(401, "해당 아이디는 사용중인 아이디입니다." ),
+    ALREADY_WITHDRAWN(401, "해당 유저는 회원탈퇴한 유저입니다." ),
     NOT_FOUND_USERNAME(401, "해당 아이디는 존재하지 않습니다."),
     FAIL(500, "실패했습니다."),
     DUPLICATE_NICKNAME(409, "해당 닉네임은 이미 사용 중입니다."),
     DUPLICATE_EMAIL(400, "중복된 이메일입니다."),
     INVALID_ADMIN_TOKEN(400, "잘못된 관리자 토큰입니다."),
     INVALID_PASSWORD(400, "비밀번호가 일치하지 않습니다."),
-    INVALID_TOKEN(400, "토큰이 일치하지 않습니다." ),
+    INVALID_TOKEN(400, "토큰이 일치하지 않습니다."),
+    INVALID_USER_STATUS(400, "회원 탈퇴한 유저입니다."),
+    INVALID_USERNAME(400, "아이디가 일치하지 않습니다."),
 
     NOT_FOUND_CHALLENGE(404, "현재 존재하는 챌린지가 없습니다.");
 
