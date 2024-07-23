@@ -4,6 +4,7 @@ import com.bod.bod.user.entity.UserRole;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -63,8 +64,7 @@ public class JwtUtil {
 			builder.claim(AUTHORIZATION_KEY, userRole);
 		}
 
-		String token = builder.compact();
-		return Base64.getUrlEncoder().withoutPadding().encodeToString(token.getBytes());
+		return builder.compact();
 	}
 
 	public void addJwtToHeader(String headerName, String token, HttpServletResponse response) {
@@ -74,14 +74,14 @@ public class JwtUtil {
 	public String getTokenFromHeader(String headerName, HttpServletRequest request) {
 		String token = request.getHeader(headerName);
 		if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-			return new String(Base64.getUrlDecoder().decode(token.substring(BEARER_PREFIX.length())));
+			return token.substring(BEARER_PREFIX.length());
 		}
 		return null;
 	}
 
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(new String(Base64.getUrlDecoder().decode(token)));
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 			return true;
 		} catch (SecurityException | MalformedJwtException | SignatureException e) {
 			logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
@@ -96,6 +96,22 @@ public class JwtUtil {
 	}
 
 	public Claims getUserInfoFromToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(new String(Base64.getUrlDecoder().decode(token))).getBody();
+		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+	}
+
+	public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, refreshToken);
+		refreshTokenCookie.setHttpOnly(true);
+		refreshTokenCookie.setPath("/");
+		refreshTokenCookie.setMaxAge((int) refreshTokenExpireTime);
+		response.addCookie(refreshTokenCookie);
+	}
+
+	public void clearRefreshTokenCookie(HttpServletResponse response) {
+		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, null);
+		refreshTokenCookie.setHttpOnly(true);
+		refreshTokenCookie.setPath("/");
+		refreshTokenCookie.setMaxAge(0);
+		response.addCookie(refreshTokenCookie);
 	}
 }

@@ -1,21 +1,22 @@
-package com.bod.bod.user.refreshToken;
+package com.bod.bod.user.service;
 
 import com.bod.bod.user.entity.User;
+import com.bod.bod.user.entity.RefreshToken;
+import com.bod.bod.user.repository.RefreshTokenRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class RefreshTokenServiceImpl {
+public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 	private final RefreshTokenRepository refreshTokenRepository;
 
-	public Optional<RefreshToken> findByToken(String token) {
-		return refreshTokenRepository.findByToken(token);
-	}
-
+	@Override
+	@Transactional
 	public RefreshToken createOrUpdateRefreshToken(User user, String token, LocalDateTime expirationAt) {
 		Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(user.getId());
 		if (existingToken.isPresent()) {
@@ -33,11 +34,22 @@ public class RefreshTokenServiceImpl {
 		}
 	}
 
+	@Override
 	public void deleteByToken(String token) {
 		refreshTokenRepository.deleteByToken(token);
+	}
+
+	@Override
+	public void deleteByUserId(Long userId) {
+		refreshTokenRepository.deleteByUserId(userId);
+	}
+
+	public Optional<RefreshToken> findByToken(String token) {
+		return refreshTokenRepository.findByToken(token);
 	}
 
 	public Optional<RefreshToken> findByUserId(Long userId) {
 		return refreshTokenRepository.findByUserId(userId);
 	}
+
 }

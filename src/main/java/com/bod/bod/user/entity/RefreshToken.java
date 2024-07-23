@@ -1,6 +1,6 @@
-package com.bod.bod.user.refreshToken;
+package com.bod.bod.user.entity;
 
-import com.bod.bod.user.entity.User;
+import com.bod.bod.global.TimeStamp;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class RefreshToken {
+public class RefreshToken extends TimeStamp {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

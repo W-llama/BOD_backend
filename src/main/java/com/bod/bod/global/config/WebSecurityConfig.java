@@ -49,8 +49,8 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/challenge/**").permitAll()
-				.requestMatchers("/api/admin/**").hasRole("ADMIN")
+				.requestMatchers(HttpMethod.GET, "/api/challenges/**").permitAll()
+				.requestMatchers("/api/admins/**").hasRole("ADMIN")
 				.anyRequest().authenticated())
 			.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)))  // OAuth2 로그인 설정
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
