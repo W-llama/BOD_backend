@@ -45,7 +45,10 @@ public class Challenge extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private ConditionStatus conditionStatus;
 
-    @Column(name = "dueTime", nullable = false)
-    private LocalDateTime dueTime;
+    @Column(name = "start_time", nullable = false)
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time", nullable = false)
+    private LocalDateTime endTime;
 
 }
