@@ -19,7 +19,7 @@ public class ChallengeController {
 
     private final ChallengeService challengeService;
 
-    @PostMapping("/admin/challenge")
+    @PostMapping("/admins/challenges")
     public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> createChallenge (@Valid @RequestBody ChallengeCreateRequestDto reqDto) {
         ChallengeResponseDto resDto = challengeService.createChallenge(reqDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>("챌린지 등록에 성공하였습니다!", resDto));

@@ -16,6 +16,8 @@ public class ChallengeService {
     public ChallengeResponseDto createChallenge(ChallengeCreateRequestDto reqDto) {
         Challenge challenge = Challenge.builder()
             .title(reqDto.getTitle())
+            .content(reqDto.getContent())
+            .image(reqDto.getImage())
             .category(reqDto.getCategory())
             .conditionStatus(reqDto.getConditionStatus())
             .startTime(reqDto.getStartTime())
