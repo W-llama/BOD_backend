@@ -17,7 +17,9 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(400, "중복된 이메일입니다."),
     INVALID_ADMIN_TOKEN(400, "잘못된 관리자 토큰입니다."),
     INVALID_PASSWORD(400, "비밀번호가 일치하지 않습니다."),
-    INVALID_TOKEN(400, "토큰이 일치하지 않습니다." );
+    INVALID_TOKEN(400, "토큰이 일치하지 않습니다." ),
+
+    NOT_FOUND_CHALLENGE(400, "현재 존재하는 챌린지가 없습니다.");
 
 
     private final int status;
