@@ -55,7 +55,7 @@ public class ChallengeService {
         return new ChallengeResponseDto(challenge);
     }
 
-    private Challenge findChallengeById(Long challengeId) {
+    public Challenge findChallengeById(Long challengeId) {
         return challengeRepository.findChallengeById(challengeId);
     }
 }

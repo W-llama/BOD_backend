@@ -22,10 +22,10 @@ public class VerificationController {
 
   private final VerificationService verificationService;
 
-  @PostMapping(value = "/users/challenges/verifications")
-  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> uploadImage(@PathVariable("challengId") Long challengeId, @RequestParam(value="image") MultipartFile image, VerificationRequestDto requestDto) throws IOException {
+  @PostMapping(value = "/users/challenges/{challengeId}/verifications")
+  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> uploadImage(@PathVariable("challengeId") Long challengeId, @RequestParam(value="image") MultipartFile image, VerificationRequestDto requestDto) throws IOException {
 	String imageName = image.getOriginalFilename();
-	VerificationResponseDto verification = verificationService.requestVerification(challengeId, image, imageName,requestDto);
+	VerificationResponseDto verification = verificationService.requestVerification(challengeId, image, imageName, requestDto);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 인증 요청 성공", verification));
   }

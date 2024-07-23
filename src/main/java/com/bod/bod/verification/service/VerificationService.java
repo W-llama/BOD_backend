@@ -1,7 +1,6 @@
 package com.bod.bod.verification.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.service.ChallengeService;
@@ -12,7 +11,6 @@ import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +35,9 @@ public class VerificationService {
       metadata.setContentLength(image.getSize());
       amazonS3Client.putObject(BUCKET, imageName, image.getInputStream(), metadata);
 
-      Challenge challenge = challengeService.
+      Challenge challenge = challengeService.findChallengeById(challengeId);
 
-      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), imageName);
+      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), imageName, challenge);
       verificationRepository.save(verification);
 
       String imageUrl= "https://" + BUCKET + imageName;
