@@ -41,6 +41,18 @@ public class User extends TimeStamp {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "nickname", nullable = false, unique = true)
+    private String nickname;
+
+    @Column(name = "introduce")
+    private String introduce;
+
+    @Column(name = "image")
+    private String image;
+
+    @Column(name = "point")
+    private Long point = 0L;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
@@ -61,4 +73,5 @@ public class User extends TimeStamp {
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
+
 }

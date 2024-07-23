@@ -1,4 +1,4 @@
-package com.bod.bod.user.profile;
+package com.bod.bod.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

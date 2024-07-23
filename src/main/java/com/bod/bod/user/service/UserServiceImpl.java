@@ -40,6 +40,7 @@ public class UserServiceImpl implements UserService {
 		checkExistingUserOrEmail(signUpRequestDto);
 		User user = createUser(signUpRequestDto);
 		userRepository.save(user);
+
 	}
 
 	@Override
@@ -69,15 +70,20 @@ public class UserServiceImpl implements UserService {
 
 	private User createUser(SignUpRequestDto signUpRequestDto) {
 		UserRole userRole = determineUserRole(signUpRequestDto);
+
 		return User.builder()
 			.username(signUpRequestDto.getUsername())
 			.email(signUpRequestDto.getEmail())
 			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
 			.name(signUpRequestDto.getName())
+			.nickname(signUpRequestDto.getNickname())
+			.introduce(signUpRequestDto.getIntroduce())
+			.image(signUpRequestDto.getImage())
 			.userStatus(UserStatus.ACTIVE)
 			.userRole(userRole)
 			.build();
 	}
+
 
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
 		checkExistingField(userRepository.findByUsername(signUpRequestDto.getUsername()), ErrorCode.ALREADY_USERNAME);

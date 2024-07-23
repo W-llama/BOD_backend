@@ -34,7 +34,20 @@ public class SignUpRequestDto {
 	)
 	private String name;
 
-	private String role = "";
+	@NotBlank(message = "Nickname is mandatory")
+	@Size(min = 3, max = 13, message = "Nickname must be between 3 and 13 characters")
+	@Pattern(
+		regexp = "^[a-zA-Z가-힣0-9]*$",
+		message = "Nickname must contain only letters and numbers"
+	)
+	private String nickname;
+
+	@Size(min = 5, max = 100)
+	private String introduce;
+
+	private String image;
+
+	private final String role = "";
 
 	private final String adminToken = "";
 
