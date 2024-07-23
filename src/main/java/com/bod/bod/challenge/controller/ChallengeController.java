@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,11 +43,19 @@ public class ChallengeController {
   }
 
   @GetMapping("/challenges")
-  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenges(
+  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
 	  @RequestParam(value = "page", defaultValue = "1") int page) {
 	List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(page - 1);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
+  }
+
+  @GetMapping("/challenges/{challengeId}")
+  public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getChallengeDetails(
+	  @PathVariable("challengeId") Long challengeId) {
+	ChallengeResponseDto challenge = challengeService.getChallengeDetails(challengeId);
+	return ResponseEntity.ok().body(new CommonResponseDto<>
+		(HttpStatus.OK.value(), "챌린지 단건 조회 성공", challenge));
   }
 
 }
