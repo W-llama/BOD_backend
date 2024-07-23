@@ -4,12 +4,14 @@ import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.verification.dto.VerificationRequestDto;
 import com.bod.bod.verification.dto.VerificationResponseDto;
 import com.bod.bod.verification.service.VerificationService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +25,7 @@ public class VerificationController {
   private final VerificationService verificationService;
 
   @PostMapping(value = "/users/challenges/{challengeId}/verifications")
-  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> uploadImage(@PathVariable("challengeId") Long challengeId, @RequestParam(value="image") MultipartFile image, VerificationRequestDto requestDto) throws IOException {
+  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> uploadImage(@PathVariable("challengeId") Long challengeId, @RequestParam(value="image") MultipartFile image, @Valid @RequestBody VerificationRequestDto requestDto) throws IOException {
 	String imageName = image.getOriginalFilename();
 	VerificationResponseDto verification = verificationService.requestVerification(challengeId, image, imageName, requestDto);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
