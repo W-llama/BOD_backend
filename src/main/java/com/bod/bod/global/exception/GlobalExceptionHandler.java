@@ -1,6 +1,5 @@
 package com.bod.bod.global.exception;
 
-import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.exception.dto.ExceptionResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
@@ -8,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -50,5 +50,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileUploadFailureException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ExceptionResponseDto> handleFileUploadFailureException(HttpServletRequest request, FileUploadFailureException ex) {
+        ExceptionResponseDto exceptionResponse = ExceptionResponseDto.builder()
+            .msg("파일 업로드 실패")
+            .path(request.getRequestURI())
+            .build();
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -49,9 +49,11 @@ public class Verification extends TimeStamp {
     @Column(nullable = false)
     private Status status;
 
-    public Verification(VerificationRequestDto requestDto) {
-        this.title = requestDto.getTitle();
-        this.content = requestDto.getContent();
-//        this.image = requestDto.getImage();
+    public Verification(String title, String content, String image, Challenge challenge) {
+        this.title = title;
+        this.content = content;
+        this.image = image;
+        this.status = Status.PENDING;
+        this.challenge = challenge;
     }
 }
