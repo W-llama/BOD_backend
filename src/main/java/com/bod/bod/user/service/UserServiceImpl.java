@@ -1,7 +1,5 @@
 package com.bod.bod.user.service;
 
-import static com.bod.bod.global.jwt.JwtUtil.REFRESH_HEADER;
-
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
@@ -11,24 +9,25 @@ import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.entity.UserStatus;
-import com.bod.bod.user.refreshToken.RefreshTokenServiceImpl;
 import com.bod.bod.user.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
-	private final RefreshTokenServiceImpl refreshTokenService;
+	private final RefreshTokenService refreshTokenService;
 
 	@Value("${JWT_SECRET_KEY}")
 	private String secretKey;
@@ -36,53 +35,64 @@ public class UserServiceImpl {
 	@Value("${jwt.refresh-expire-time}")
 	private int refreshTokenExpireTime; // 초 단위
 
+	@Override
+	@Transactional
 	public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-		validateEmail(signUpRequestDto.getEmail());
-
 		UserRole userRole = determineUserRole(signUpRequestDto);
-		User user = buildUser(signUpRequestDto, userRole);
+
+		User user = User.builder()
+			.username(signUpRequestDto.getUsername())
+			.email(signUpRequestDto.getEmail())
+			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
+			.name(signUpRequestDto.getName())
+			.userStatus(UserStatus.ACTIVE)
+			.userRole(userRole)
+			.build();
 
 		userRepository.save(user);
 		return new UserResponseDto(user);
 	}
 
+	@Override
+	@Transactional
 	public UserResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
 		User user = userRepository.findByUsername(loginRequestDto.getUsername())
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-		validatePassword(loginRequestDto.getPassword(), user.getPassword());
+		if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
+		}
 
 		String accessToken = jwtUtil.createAccessToken(user.getUsername(), user.getUserRole());
 		String refreshToken = jwtUtil.createRefreshToken(user.getUsername());
 
 		refreshTokenService.createOrUpdateRefreshToken(user, refreshToken, LocalDateTime.now().plusSeconds(refreshTokenExpireTime));
 
-		addTokensToResponse(response, accessToken, refreshToken);
+		jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + accessToken, response);
+		jwtUtil.addRefreshTokenCookie(response, refreshToken);
+		user.login();
 
 		return new UserResponseDto(user);
 	}
 
-	private void validateEmail(String email) {
-		if (userRepository.existsByEmail(email)) {
-			throw new GlobalException(ErrorCode.DUPLICATE_EMAIL);
-		}
-	}
+	@Override
+	@Transactional
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
+		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
+		if (token != null) {
+			Claims claims = jwtUtil.getUserInfoFromToken(token);
+			String username = claims.getSubject();
 
-	private void validatePassword(String rawPassword, String encodedPassword) {
-		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
-		}
-	}
+			User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-	private User buildUser(SignUpRequestDto dto, UserRole role) {
-		return User.builder()
-			.username(dto.getUsername())
-			.email(dto.getEmail())
-			.password(passwordEncoder.encode(dto.getPassword()))
-			.name(dto.getName())
-			.userStatus(UserStatus.ACTIVE)
-			.userRole(role)
-			.build();
+			refreshTokenService.deleteByUserId(user.getId());
+
+			jwtUtil.clearRefreshTokenCookie(response);
+			user.logout();
+		} else {
+			throw new GlobalException(ErrorCode.INVALID_TOKEN);
+		}
 	}
 
 	private UserRole determineUserRole(SignUpRequestDto signUpRequestDto) {
@@ -97,19 +107,5 @@ public class UserServiceImpl {
 		if (adminToken == null || !adminToken.equals(secretKey)) {
 			throw new GlobalException(ErrorCode.INVALID_ADMIN_TOKEN);
 		}
-	}
-
-	private void addTokensToResponse(HttpServletResponse response, String accessToken, String refreshToken) {
-		jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, accessToken, response);
-		addRefreshTokenCookie(response, refreshToken);
-	}
-
-	private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, refreshToken);
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		refreshTokenCookie.setMaxAge(refreshTokenExpireTime);
-
-		response.addCookie(refreshTokenCookie);
 	}
 }
