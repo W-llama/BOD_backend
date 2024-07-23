@@ -1,6 +1,7 @@
 package com.bod.bod.challenge.entity;
 
 import com.bod.bod.global.TimeStamp;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,9 +46,11 @@ public class Challenge extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private ConditionStatus conditionStatus;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
