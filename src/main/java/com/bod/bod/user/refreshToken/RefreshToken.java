@@ -1,11 +1,7 @@
 package com.bod.bod.user.refreshToken;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.bod.bod.user.entity.User;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,10 +25,11 @@ public class RefreshToken {
 	private String token;
 
 	@Column(nullable = false)
-	private String username;
-
-	@Column(nullable = false)
 	private LocalDateTime expirationAt;
+
+	@OneToOne
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	public void updateToken(String token) {
 		this.token = token;

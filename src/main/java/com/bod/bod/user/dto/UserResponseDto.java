@@ -7,12 +7,10 @@ import lombok.Getter;
 public class UserResponseDto {
 
 	private String email;
-
 	private String name;
 
 	public UserResponseDto(User user) {
 		this.email = user.getEmail();
-		this.name = user.getUsername();
-
+		this.name = user.getName();
 	}
 }
