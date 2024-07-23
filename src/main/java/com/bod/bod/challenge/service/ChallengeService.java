@@ -49,4 +49,13 @@ public class ChallengeService {
         }
         return challengeList;
     }
+
+    public ChallengeResponseDto getChallengeDetails(Long challengeId) {
+        Challenge challenge = findChallengeById(challengeId);
+        return new ChallengeResponseDto(challenge);
+    }
+
+    private Challenge findChallengeById(Long challengeId) {
+        return challengeRepository.findChallengeById(challengeId);
+    }
 }

@@ -1,21 +1,30 @@
 package com.bod.bod.global.jwt;
 
+import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
-import io.jsonwebtoken.*;
+import com.bod.bod.user.service.RefreshTokenService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.security.Key;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
-import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
 
 @Component
 public class JwtUtil {
@@ -71,6 +80,29 @@ public class JwtUtil {
 		response.addHeader(headerName, token);
 	}
 
+	public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
+		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, refreshToken);
+		refreshTokenCookie.setHttpOnly(true);
+		refreshTokenCookie.setPath("/");
+		refreshTokenCookie.setMaxAge((int) refreshTokenExpireTime);
+
+		response.addCookie(refreshTokenCookie);
+	}
+
+	public void clearAuthToken(HttpServletResponse response) {
+		addJwtToHeader(AUTHORIZATION_HEADER, "", response);
+	}
+
+	public void issueTokens(User user, HttpServletResponse response, RefreshTokenService refreshTokenService, int refreshTokenExpireTime) {
+		String accessToken = createAccessToken(user.getUsername(), user.getUserRole());
+		String refreshToken = createRefreshToken(user.getUsername());
+
+		refreshTokenService.createOrUpdateRefreshToken(user, refreshToken, LocalDateTime.now().plusSeconds(refreshTokenExpireTime));
+
+		addJwtToHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken, response);
+		addRefreshTokenCookie(response, refreshToken);
+	}
+
 	public String getTokenFromHeader(String headerName, HttpServletRequest request) {
 		String token = request.getHeader(headerName);
 		if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
@@ -97,21 +129,5 @@ public class JwtUtil {
 
 	public Claims getUserInfoFromToken(String token) {
 		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-	}
-
-	public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, refreshToken);
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		refreshTokenCookie.setMaxAge((int) refreshTokenExpireTime);
-		response.addCookie(refreshTokenCookie);
-	}
-
-	public void clearRefreshTokenCookie(HttpServletResponse response) {
-		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, null);
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		refreshTokenCookie.setMaxAge(0);
-		response.addCookie(refreshTokenCookie);
 	}
 }
