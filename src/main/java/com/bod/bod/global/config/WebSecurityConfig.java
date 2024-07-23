@@ -47,7 +47,7 @@ public class WebSecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 설정 : STATELESS
 
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(HttpMethod.POST, "/api/signup").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/challenge/**").permitAll()
 				.requestMatchers("/api/admin/**").hasRole("ADMIN")

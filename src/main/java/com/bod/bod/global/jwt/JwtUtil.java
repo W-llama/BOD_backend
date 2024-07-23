@@ -20,7 +20,7 @@ import java.util.Date;
 public class JwtUtil {
 
 	public static final String AUTHORIZATION_HEADER = "Authorization";
-	public static final String REFRESH_HEADER = "refresh";
+	public static final String REFRESH_HEADER = "Refresh";
 	public static final String AUTHORIZATION_KEY = "auth";
 	public static final String BEARER_PREFIX = "Bearer ";
 	private static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
@@ -63,7 +63,8 @@ public class JwtUtil {
 			builder.claim(AUTHORIZATION_KEY, userRole);
 		}
 
-		return BEARER_PREFIX + builder.compact();
+		String token = builder.compact();
+		return Base64.getUrlEncoder().withoutPadding().encodeToString(token.getBytes());
 	}
 
 	public void addJwtToHeader(String headerName, String token, HttpServletResponse response) {
@@ -73,14 +74,14 @@ public class JwtUtil {
 	public String getTokenFromHeader(String headerName, HttpServletRequest request) {
 		String token = request.getHeader(headerName);
 		if (StringUtils.hasText(token) && token.startsWith(BEARER_PREFIX)) {
-			return token.substring(BEARER_PREFIX.length());
+			return new String(Base64.getUrlDecoder().decode(token.substring(BEARER_PREFIX.length())));
 		}
 		return null;
 	}
 
 	public boolean validateToken(String token) {
 		try {
-			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+			Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(new String(Base64.getUrlDecoder().decode(token)));
 			return true;
 		} catch (SecurityException | MalformedJwtException | SignatureException e) {
 			logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
@@ -95,6 +96,6 @@ public class JwtUtil {
 	}
 
 	public Claims getUserInfoFromToken(String token) {
-		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(new String(Base64.getUrlDecoder().decode(token))).getBody();
 	}
 }

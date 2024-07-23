@@ -1,9 +1,11 @@
 package com.bod.bod.user.controller;
 
 import com.bod.bod.global.dto.CommonResponseDto;
+import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +30,18 @@ public class UserController {
 		return ResponseEntity.ok().body(CommonResponseDto.<UserResponseDto>builder()
 			.msg("회원 가입이 완료되었습니다")
 			.data(userResponseDto)
+			.build());
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<CommonResponseDto<Void>> login(
+		@RequestBody @Valid LoginRequestDto loginRequestDto,
+		HttpServletResponse response
+	) {
+		userService.login(loginRequestDto, response);
+
+		return ResponseEntity.ok().body(CommonResponseDto.<Void>builder()
+			.msg("로그인이 완료되었습니다.")
 			.build());
 	}
 }
