@@ -24,6 +24,14 @@ repositories {
 }
 
 dependencies {
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //JWT
+    compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
     // JPA, QueryDSL
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -31,13 +39,21 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    //OAuth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // Web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
