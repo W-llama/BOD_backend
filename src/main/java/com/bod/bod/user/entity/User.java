@@ -50,13 +50,15 @@ public class User extends TimeStamp {
     private UserRole userRole;
 
 
-    // 이메일 업데이트 메서드
     public void setEmail(String email) {
         this.email = email;
     }
 
-    // 이름 업데이트 메서드
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 }

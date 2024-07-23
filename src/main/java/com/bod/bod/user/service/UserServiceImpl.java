@@ -12,7 +12,7 @@ import com.bod.bod.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,9 +37,39 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void signUp(SignUpRequestDto signUpRequestDto) {
-		UserRole userRole = determineUserRole(signUpRequestDto);
+		checkExistingUserOrEmail(signUpRequestDto);
+		User user = createUser(signUpRequestDto);
+		userRepository.save(user);
+	}
 
-		User user = User.builder()
+	@Override
+	@Transactional
+	public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+		User user = validateLoginRequest(loginRequestDto);
+		jwtUtil.issueTokens(user, response, refreshTokenService, refreshTokenExpireTime);
+	}
+
+	@Override
+	@Transactional
+	public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
+		validateTokenOwnership(request, user);
+		refreshTokenService.deleteByUserId(user.getId());
+		jwtUtil.clearAuthToken(response);
+	}
+
+	@Override
+	@Transactional
+	public void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response) {
+		validateUserOwnership(loginRequestDto, user);
+		user.setUserStatus(UserStatus.WITHDRAW);
+		refreshTokenService.deleteByUserId(user.getId());
+		jwtUtil.clearAuthToken(response);
+		userRepository.save(user);
+	}
+
+	private User createUser(SignUpRequestDto signUpRequestDto) {
+		UserRole userRole = determineUserRole(signUpRequestDto);
+		return User.builder()
 			.username(signUpRequestDto.getUsername())
 			.email(signUpRequestDto.getEmail())
 			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
@@ -47,45 +77,21 @@ public class UserServiceImpl implements UserService {
 			.userStatus(UserStatus.ACTIVE)
 			.userRole(userRole)
 			.build();
-
-		userRepository.save(user);
 	}
 
-	@Override
-	@Transactional
-	public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
-		User user = userRepository.findByUsername(loginRequestDto.getUsername())
-			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
-
-		if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
-			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
-		}
-
-		String accessToken = jwtUtil.createAccessToken(user.getUsername(), user.getUserRole());
-		String refreshToken = jwtUtil.createRefreshToken(user.getUsername());
-
-		refreshTokenService.createOrUpdateRefreshToken(user, refreshToken, LocalDateTime.now().plusSeconds(refreshTokenExpireTime));
-
-		jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + accessToken, response);
-		jwtUtil.addRefreshTokenCookie(response, refreshToken);
+	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
+		checkExistingField(userRepository.findByUsername(signUpRequestDto.getUsername()), ErrorCode.ALREADY_USERNAME);
+		checkExistingField(userRepository.findByEmail(signUpRequestDto.getEmail()), ErrorCode.DUPLICATE_EMAIL);
 	}
 
-	@Override
-	@Transactional
-	public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
-		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
-		if (token != null) {
-			Claims claims = jwtUtil.getUserInfoFromToken(token);
-			String tokenUsername = claims.getSubject();
-
-			if (!user.getUsername().equals(tokenUsername)) {
-				throw new GlobalException(ErrorCode.INVALID_TOKEN);
+	private void checkExistingField(Optional<User> existingField, ErrorCode errorCode) {
+		if (existingField.isPresent()) {
+			User user = existingField.get();
+			if (user.getUserStatus() == UserStatus.WITHDRAW) {
+				throw new GlobalException(ErrorCode.ALREADY_WITHDRAWN);
+			} else {
+				throw new GlobalException(errorCode);
 			}
-
-			refreshTokenService.deleteByUserId(user.getId());
-			jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, "", response);
-		} else {
-			throw new GlobalException(ErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -101,5 +107,50 @@ public class UserServiceImpl implements UserService {
 		if (adminToken == null || !adminToken.equals(secretKey)) {
 			throw new GlobalException(ErrorCode.INVALID_ADMIN_TOKEN);
 		}
+	}
+
+	private User validateLoginRequest(LoginRequestDto loginRequestDto) {
+		User user = findActiveUserByUsername(loginRequestDto.getUsername());
+		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
+		return user;
+	}
+
+	private User findActiveUserByUsername(String username) {
+		User user = userRepository.findByUsername(username)
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+
+		if (user.getUserStatus() == UserStatus.WITHDRAW) {
+			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
+		}
+		return user;
+	}
+
+	private void validateUserPassword(String rawPassword, String encodedPassword) {
+		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
+		}
+	}
+
+	private void validateTokenOwnership(HttpServletRequest request, User user) {
+		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
+		if (token != null) {
+			Claims claims = jwtUtil.getUserInfoFromToken(token);
+			String tokenUsername = claims.getSubject();
+			if (!user.getUsername().equals(tokenUsername)) {
+				throw new GlobalException(ErrorCode.INVALID_TOKEN);
+			}
+		} else {
+			throw new GlobalException(ErrorCode.INVALID_TOKEN);
+		}
+	}
+
+	private void validateUserOwnership(LoginRequestDto loginRequestDto, User user) {
+		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
+			throw new GlobalException(ErrorCode.INVALID_USERNAME);
+		}
+		if (user.getUserStatus() == UserStatus.WITHDRAW) {
+			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
+		}
+		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
 	}
 }

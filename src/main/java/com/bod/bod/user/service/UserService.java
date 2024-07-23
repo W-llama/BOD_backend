@@ -15,6 +15,10 @@ public interface UserService {
 	@Transactional
 	void login(LoginRequestDto loginRequestDto, HttpServletResponse response);
 
+
 	@Transactional
 	void logout(HttpServletRequest request, HttpServletResponse response, User user);
+
+	@Transactional
+	void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response);
 }
