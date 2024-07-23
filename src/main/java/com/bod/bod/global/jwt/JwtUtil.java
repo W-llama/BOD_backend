@@ -107,11 +107,4 @@ public class JwtUtil {
 		response.addCookie(refreshTokenCookie);
 	}
 
-	public void clearRefreshTokenCookie(HttpServletResponse response) {
-		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, null);
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		refreshTokenCookie.setMaxAge(0);
-		response.addCookie(refreshTokenCookie);
-	}
 }

@@ -5,7 +5,6 @@ import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
 import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
-import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.entity.UserStatus;
@@ -37,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public UserResponseDto signUp(SignUpRequestDto signUpRequestDto) {
+	public void signUp(SignUpRequestDto signUpRequestDto) {
 		UserRole userRole = determineUserRole(signUpRequestDto);
 
 		User user = User.builder()
@@ -50,12 +49,11 @@ public class UserServiceImpl implements UserService {
 			.build();
 
 		userRepository.save(user);
-		return new UserResponseDto(user);
 	}
 
 	@Override
 	@Transactional
-	public UserResponseDto login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+	public void login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
 		User user = userRepository.findByUsername(loginRequestDto.getUsername())
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
@@ -70,26 +68,22 @@ public class UserServiceImpl implements UserService {
 
 		jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + accessToken, response);
 		jwtUtil.addRefreshTokenCookie(response, refreshToken);
-		user.login();
-
-		return new UserResponseDto(user);
 	}
 
 	@Override
 	@Transactional
-	public void logout(HttpServletRequest request, HttpServletResponse response) {
+	public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
 		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
 		if (token != null) {
 			Claims claims = jwtUtil.getUserInfoFromToken(token);
-			String username = claims.getSubject();
+			String tokenUsername = claims.getSubject();
 
-			User user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+			if (!user.getUsername().equals(tokenUsername)) {
+				throw new GlobalException(ErrorCode.INVALID_TOKEN);
+			}
 
 			refreshTokenService.deleteByUserId(user.getId());
-
-			jwtUtil.clearRefreshTokenCookie(response);
-			user.logout();
+			jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, "", response);
 		} else {
 			throw new GlobalException(ErrorCode.INVALID_TOKEN);
 		}

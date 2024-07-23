@@ -50,16 +50,6 @@ public class User extends TimeStamp {
     private UserRole userRole;
 
 
-    // 로그인 상태로 변경하는 메서드
-    public void login() {
-        this.userStatus = UserStatus.ACTIVE;
-    }
-
-    // 로그아웃 상태로 변경하는 메서드
-    public void logout() {
-        this.userStatus = UserStatus.LOGOUT;
-    }
-
     // 이메일 업데이트 메서드
     public void setEmail(String email) {
         this.email = email;

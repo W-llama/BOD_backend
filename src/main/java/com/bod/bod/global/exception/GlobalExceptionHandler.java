@@ -1,6 +1,5 @@
 package com.bod.bod.global.exception;
 
-import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.exception.dto.ExceptionResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;

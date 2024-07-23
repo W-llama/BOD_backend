@@ -1,7 +1,7 @@
 package com.bod.bod.user.service;
 
-import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.RefreshToken;
+import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.RefreshTokenRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,21 +35,24 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 	}
 
 	@Override
+	@Transactional
 	public void deleteByToken(String token) {
 		refreshTokenRepository.deleteByToken(token);
 	}
 
 	@Override
+	@Transactional
 	public void deleteByUserId(Long userId) {
 		refreshTokenRepository.deleteByUserId(userId);
 	}
 
+	@Override
 	public Optional<RefreshToken> findByToken(String token) {
 		return refreshTokenRepository.findByToken(token);
 	}
 
+	@Override
 	public Optional<RefreshToken> findByUserId(Long userId) {
 		return refreshTokenRepository.findByUserId(userId);
 	}
-
 }
