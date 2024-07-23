@@ -34,8 +34,8 @@ public class User extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Column(name = "role", nullable = false)
-    private Role role;
+//    @Column(name = "role", nullable = false)
+//    private Role role;
 
     @Column(name = "point",nullable = true)
     private Long point;
