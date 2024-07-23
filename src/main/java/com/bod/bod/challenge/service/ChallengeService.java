@@ -42,4 +42,11 @@ public class ChallengeService {
         return challengeList;
     }
 
+    public List<ChallengeSummaryResponseDto> getAllChallenges(int page) {
+        List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeList(page);
+        if (challengeList.isEmpty()) {
+            throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
+        }
+        return challengeList;
+    }
 }

@@ -7,5 +7,6 @@ import java.util.List;
 public interface ChallengeCustomRepository {
 
   List<ChallengeSummaryResponseDto> getChallengeListByCategory(int page, Category category);
+  List<ChallengeSummaryResponseDto> getChallengeList(int page);
 
 }
