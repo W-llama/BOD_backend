@@ -54,4 +54,14 @@ public class Challenge extends TimeStamp {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
+    public void changeChallenge (String title, String content, String image, Category category, ConditionStatus conditionStatus, LocalDateTime startTime, LocalDateTime endTime) {
+        this.title = title;
+        this.content = content;
+        this.image = image;
+        this.category = category;
+        this.conditionStatus = conditionStatus;
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
+
 }

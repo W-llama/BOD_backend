@@ -1,7 +1,9 @@
 package com.bod.bod.user.service;
 
 import com.bod.bod.user.dto.LoginRequestDto;
+import com.bod.bod.user.dto.ProfileRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
+import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,4 +23,10 @@ public interface UserService {
 
 	@Transactional
 	void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response);
+
+	@Transactional(readOnly = true)
+	UserResponseDto getProfile(User user);
+
+	@Transactional
+	UserResponseDto editProfile(ProfileRequestDto profileRequestDto, User user);
 }
