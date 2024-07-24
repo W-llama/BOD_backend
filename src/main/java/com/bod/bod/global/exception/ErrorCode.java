@@ -23,7 +23,10 @@ public enum ErrorCode {
     INVALID_USER_STATUS(400, "회원 탈퇴한 유저입니다."),
     INVALID_USERNAME(400, "아이디가 일치하지 않습니다."),
 
-    NOT_FOUND_CHALLENGE(404, "현재 존재하는 챌린지가 없습니다.");
+    NOT_FOUND_CHALLENGE(404, "해당 챌린지는 존재하지 않습니다."),
+
+    NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다.");
+
 
 
     private final int status;
