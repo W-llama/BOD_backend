@@ -1,20 +1,16 @@
 package com.bod.bod.user.entity;
 
 import com.bod.bod.global.TimeStamp;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "db_users")
 @Getter
@@ -61,6 +57,9 @@ public class User extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserPasswordHistory> passwordHistories = new ArrayList<>();
 
     public void changeEmail(String email) {
         this.email = email;
@@ -85,4 +84,9 @@ public class User extends TimeStamp {
     public void changeImage(String image) {
         this.image = image;
     }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
 }

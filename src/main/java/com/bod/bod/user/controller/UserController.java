@@ -2,8 +2,9 @@ package com.bod.bod.user.controller;
 
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
+import com.bod.bod.user.dto.EditPasswordRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
-import com.bod.bod.user.dto.ProfileRequestDto;
+import com.bod.bod.user.dto.EditProfileRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserServiceImpl;
@@ -53,7 +54,7 @@ public class UserController {
 			HttpStatus.OK.value(), "로그아웃이 완료되었습니다.", null));
 	}
 
-	@PutMapping("/withdraw")
+	@DeleteMapping("/withdraw")
 	public ResponseEntity<CommonResponseDto<Void>> withdraw(
 		@RequestBody @Valid LoginRequestDto loginRequestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -75,11 +76,21 @@ public class UserController {
 
 	@PutMapping("/users/profile")
 	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfile(
-		@RequestBody @Valid ProfileRequestDto profileRequestDto,
+		@RequestBody @Valid EditProfileRequestDto editProfileRequestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		UserResponseDto userResponseDto = userService.editProfile(profileRequestDto, userDetails.getUser());
+		UserResponseDto userResponseDto = userService.editProfile(editProfileRequestDto, userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "회원정보 수정이 완료되었습니다.", userResponseDto));
+	}
+
+	@PutMapping("/users/profile/password")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> editPassword(
+		@RequestBody @Valid EditPasswordRequestDto editPasswordRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.editPassword(editPasswordRequestDto, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "비밀번호 수정이 완료되었습니다.", userResponseDto));
 	}
 }
