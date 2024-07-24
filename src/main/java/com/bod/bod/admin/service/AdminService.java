@@ -1,5 +1,7 @@
 package com.bod.bod.admin.service;
 
+import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
+import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
@@ -40,5 +42,15 @@ public class AdminService {
         user.setName(requestDto.getName());
 
         return new AdminUserUpdateResponseDto(user);
+    }
+
+    @Transactional
+    public AdminUserStatusUpdateResponseDto updateUserStatus(long userId, AdminUserStatusUpdateRequestDto requestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+
+        user.setUserStatus(requestDto.getUserStatus());
+
+        return new AdminUserStatusUpdateResponseDto(user);
     }
 }

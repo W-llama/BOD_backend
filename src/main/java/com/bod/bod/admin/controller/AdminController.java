@@ -1,5 +1,7 @@
 package com.bod.bod.admin.controller;
 
+import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
+import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
@@ -47,5 +49,15 @@ public class AdminController {
         AdminUserUpdateResponseDto adminUserUpdateResponseDto = adminService.updateUser(userId, requestDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "회원 정보 수정에 성공하였습니다!", adminUserUpdateResponseDto));
+    }
+
+    @PutMapping("/admins/users/{userId}/status")
+    public ResponseEntity<CommonResponseDto<AdminUserStatusUpdateResponseDto>> updateUserStatus(
+        @PathVariable(name = "userId") Long userId,
+        @Valid @RequestBody AdminUserStatusUpdateRequestDto requestDto
+    ) {
+        AdminUserStatusUpdateResponseDto adminUserStatusUpdateResponseDto = adminService.updateUserStatus(userId, requestDto);
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "회원 상태 수정에 성공하였습니다!", adminUserStatusUpdateResponseDto));
     }
 }
