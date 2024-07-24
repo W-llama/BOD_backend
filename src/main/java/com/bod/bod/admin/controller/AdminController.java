@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -83,5 +84,13 @@ public class AdminController {
        AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 수정에 성공하였습니다!", resDto));
+    }
+
+    @DeleteMapping("/admins/challenges/{challengeId}")
+    public ResponseEntity<CommonResponseDto<Void>> deleteChallenge(
+        @PathVariable(name = "challengeId") Long challengeId
+    ) {
+        adminService.deleteChallenge(challengeId);
+        return ResponseEntity.ok().body(new CommonResponseDto<>(HttpStatus.OK.value(), "챌린지 삭제에 성공하였습니다!", null));
     }
 }
