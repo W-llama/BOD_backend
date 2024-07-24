@@ -9,6 +9,7 @@ import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
+import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.admin.service.AdminService;
 import com.bod.bod.global.dto.CommonResponseDto;
 import jakarta.validation.Valid;
@@ -81,7 +82,7 @@ public class AdminController {
         @PathVariable(name = "challengeId") Long challengeId,
         @Valid @RequestBody AdminChallengeUpdateRequestDto reqDto
     ) {
-       AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto);
+        AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 수정에 성공하였습니다!", resDto));
     }
@@ -92,5 +93,19 @@ public class AdminController {
     ) {
         adminService.deleteChallenge(challengeId);
         return ResponseEntity.ok().body(new CommonResponseDto<>(HttpStatus.OK.value(), "챌린지 삭제에 성공하였습니다!", null));
+    }
+
+    @GetMapping("/admins/challenges/{challengeId}/verifications")
+    public ResponseEntity<CommonResponseDto<List<AdminVerificationGetResponse>>> getVerifications(
+        @PathVariable(name = "challengeId") Long challengeId,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
+    ) {
+        Page<AdminVerificationGetResponse> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc);
+        List<AdminVerificationGetResponse> verifications = responseDto.getContent();
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 인증 요청 목록 조회에 성공하였습니다!", verifications));
     }
 }

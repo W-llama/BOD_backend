@@ -9,12 +9,15 @@ import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
+import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.repository.ChallengeRepository;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.UserRepository;
+import com.bod.bod.verification.entity.Verification;
+import com.bod.bod.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,10 +32,11 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
+    private final VerificationRepository verificationRepository;
 
     public Page<AdminUsersResponseDto> getAllUsers(int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction,sortBy);
+        Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
         Page<User> userList;
@@ -82,7 +86,8 @@ public class AdminService {
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(), reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
+        challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(),
+            reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
 
         return new AdminChallengeUpdateResponseDto(challenge);
     }
@@ -93,5 +98,20 @@ public class AdminService {
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
         challengeRepository.delete(challenge);
+    }
+
+    @Transactional
+    public Page<AdminVerificationGetResponse> getVerifications(long chellengeId, int page, int size, String sortBy, boolean isAsc) {
+        challengeRepository.findById(chellengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Verification> verifications;
+        verifications = verificationRepository.findByChallengeId(chellengeId, pageable);
+
+        return verifications.map(AdminVerificationGetResponse::new);
     }
 }
