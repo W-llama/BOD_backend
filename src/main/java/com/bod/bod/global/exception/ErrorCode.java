@@ -25,6 +25,8 @@ public enum ErrorCode {
 
     NOT_FOUND_CHALLENGE(404, "해당 챌린지는 존재하지 않습니다."),
 
+    EMPTY_VERIFICATION(404, "해당 챌린지에는 현재까지 인증 신청 내역이 없습니다."),
+    ACCESS_DENIED_VERIFICATION(403, "해당 인증에 대한 수정/삭제 권한이 없는 유저입니다."),
     NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다.");
 
 

@@ -2,6 +2,8 @@ package com.bod.bod.verification.entity;
 
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.TimeStamp;
+import com.bod.bod.global.exception.ErrorCode;
+import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,7 +62,7 @@ public class Verification extends TimeStamp {
     }
     public boolean checkUser(User user) {
         if (!this.user.getId().equals(user.getId())) {
-            throw new IllegalArgumentException("해당 인증에 대한 수정/삭제 권한이 없는 유저입니다.");
+            throw new GlobalException(ErrorCode.ACCESS_DENIED_VERIFICATION);
         } return true;
     }
 }
