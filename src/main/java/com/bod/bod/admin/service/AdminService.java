@@ -1,10 +1,18 @@
 package com.bod.bod.admin.service;
 
+import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
+import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
+import com.bod.bod.challenge.dto.ChallengeCreateRequestDto;
+import com.bod.bod.challenge.dto.ChallengeResponseDto;
+import com.bod.bod.challenge.entity.Challenge;
+import com.bod.bod.challenge.repository.ChallengeRepository;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
@@ -22,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
 
     public Page<AdminUsersResponseDto> getAllUsers(int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
@@ -52,5 +61,31 @@ public class AdminService {
         user.setUserStatus(requestDto.getUserStatus());
 
         return new AdminUserStatusUpdateResponseDto(user);
+    }
+
+    public AdminChallengeCreateResponseDto createChallenge(AdminChallengeCreateRequestDto reqDto) {
+        Challenge challenge = Challenge.builder()
+            .title(reqDto.getTitle())
+            .content(reqDto.getContent())
+            .image(reqDto.getImage())
+            .category(reqDto.getCategory())
+            .conditionStatus(reqDto.getConditionStatus())
+            .startTime(reqDto.getStartTime())
+            .endTime(reqDto.getEndTime())
+            .build();
+
+        Challenge savedChallenge = challengeRepository.save(challenge);
+
+        return new AdminChallengeCreateResponseDto(savedChallenge);
+    }
+
+    @Transactional
+    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+        challenge.setChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(), reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
+
+        return new AdminChallengeUpdateResponseDto(challenge);
     }
 }
