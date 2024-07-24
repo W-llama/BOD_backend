@@ -11,16 +11,6 @@ public class GoogleUserResponseDto implements OAuth2ResponseDto{
 	}
 
 	@Override
-	public String getProvider() {
-		return "google";
-	}
-
-	@Override
-	public String getProviderId() {
-		return getAttributeValue("sub");
-	}
-
-	@Override
 	public String getEmail() {
 		return getAttributeValue("email");
 	}
@@ -28,6 +18,15 @@ public class GoogleUserResponseDto implements OAuth2ResponseDto{
 	@Override
 	public String getName() {
 		return getAttributeValue("name");
+	}
+	@Override
+	public String getNickname() {
+		return getAttributeValue("nickname");
+	}
+
+	@Override
+	public String getProfileImage() {
+		return getAttributeValue("profile_image");
 	}
 
 	private String getAttributeValue(String key) {

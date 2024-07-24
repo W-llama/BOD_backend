@@ -11,16 +11,6 @@ public class NaverUserResponseDto implements OAuth2ResponseDto {
 	}
 
 	@Override
-	public String getProvider() {
-		return "naver";
-	}
-
-	@Override
-	public String getProviderId() {
-		return getAttributeValue("id");
-	}
-
-	@Override
 	public String getEmail() {
 		return getAttributeValue("email");
 	}
@@ -28,6 +18,15 @@ public class NaverUserResponseDto implements OAuth2ResponseDto {
 	@Override
 	public String getName() {
 		return getAttributeValue("name");
+	}
+	@Override
+	public String getNickname() {
+		return getAttributeValue("nickname");
+	}
+
+	@Override
+	public String getProfileImage() {
+		return getAttributeValue("profile_image");
 	}
 
 	@SuppressWarnings("unchecked")

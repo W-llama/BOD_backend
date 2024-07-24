@@ -2,6 +2,7 @@ package com.bod.bod.user.service;
 
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
+import com.bod.bod.user.entity.UserStatus;
 import com.bod.bod.user.oauth2.CustomOAuth2User;
 import com.bod.bod.user.oauth2.GoogleUserResponseDto;
 import com.bod.bod.user.oauth2.NaverUserResponseDto;
@@ -37,10 +38,12 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
 			throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
 		}
 
-		String username = oAuth2ResponseDto.getProvider() + "_" + oAuth2ResponseDto.getProviderId();
-		Optional<User> optionalUser = userRepository.findByUsername(username);
+		String email = oAuth2ResponseDto.getEmail();
+		Optional<User> optionalUser = userRepository.findByEmail(email);
 
-		return optionalUser.map(user -> updateUser(user, oAuth2ResponseDto)).orElseGet(() -> createUser(username, oAuth2ResponseDto));
+		return optionalUser.map(user ->
+			updateUser(user, oAuth2ResponseDto)).orElseGet(() ->
+			createUser(oAuth2ResponseDto));
 	}
 
 	private OAuth2ResponseDto getOAuth2ResponseDto(String registrationId, OAuth2User oAuth2User) {
@@ -59,30 +62,41 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
 
 		OAuth2UserInfo userInfo = OAuth2UserInfo.builder()
 			.username(existingUser.getUsername())
+			.password(existingUser.getPassword())
 			.name(existingUser.getName())
+			.nickname(existingUser.getNickname())
 			.email(oAuth2ResponseDto.getEmail())
+			.profileImage(oAuth2ResponseDto.getProfileImage())
 			.role(UserRole.USER)
+			.userStatus(UserStatus.ACTIVE)
 			.build();
 
 		return new CustomOAuth2User(userInfo);
 	}
 
-	private OAuth2User createUser(String username, OAuth2ResponseDto oAuth2ResponseDto) {
+	private OAuth2User createUser(OAuth2ResponseDto oAuth2ResponseDto) {
 		User newUser = User.builder()
-			.username(username)
+			.username(oAuth2ResponseDto.getEmail())
 			.password(passwordEncoder.encode("temporary_password")) // 임시 비밀번호를 암호화
 			.name(oAuth2ResponseDto.getName())
+			.nickname(oAuth2ResponseDto.getEmail())
 			.email(oAuth2ResponseDto.getEmail())
+			.image(oAuth2ResponseDto.getProfileImage())
 			.userRole(UserRole.USER)
+			.userStatus(UserStatus.ACTIVE)
 			.build();
 
 		userRepository.save(newUser);
 
 		OAuth2UserInfo userInfo = OAuth2UserInfo.builder()
 			.username(newUser.getUsername())
+			.password(newUser.getPassword())
 			.name(newUser.getName())
-			.email(oAuth2ResponseDto.getEmail())
+			.nickname(newUser.getEmail())
+			.email(newUser.getEmail())
+			.profileImage(newUser.getImage())
 			.role(UserRole.USER)
+			.userStatus(UserStatus.ACTIVE)
 			.build();
 
 		return new CustomOAuth2User(userInfo);
