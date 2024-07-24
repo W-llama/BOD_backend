@@ -3,9 +3,10 @@ package com.bod.bod.verification.entity;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.TimeStamp;
 import com.bod.bod.user.entity.User;
-import com.bod.bod.verification.dto.VerificationRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -47,13 +47,20 @@ public class Verification extends TimeStamp {
     private String content;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Status status;
 
-    public Verification(String title, String content, String image, Challenge challenge) {
+    public Verification(String title, String content, String image, Challenge challenge, User user) {
         this.title = title;
         this.content = content;
         this.image = image;
         this.status = Status.PENDING;
         this.challenge = challenge;
+        this.user = user;
+    }
+    public boolean checkUser(User user) {
+        if (!this.user.getId().equals(user.getId())) {
+            throw new IllegalArgumentException("해당 인증에 대한 수정/삭제 권한이 없는 유저입니다.");
+        } return true;
     }
 }

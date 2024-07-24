@@ -6,8 +6,4 @@ public class FileUploadFailureException extends RuntimeException{
 	super(message);
   }
 
-  public FileUploadFailureException(String message, Throwable cause) {
-	super(message, cause);
-  }
-
 }
