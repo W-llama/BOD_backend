@@ -89,6 +89,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public UserResponseDto getProfile(User user) {
+		return new UserResponseDto(user);
+	}
+
+	@Override
 	@Transactional
 	public UserResponseDto editProfile(ProfileRequestDto profileRequestDto, User user) {
 		if (!profileRequestDto.getNickname().equals(user.getNickname())) {
@@ -179,4 +185,6 @@ public class UserServiceImpl implements UserService {
 			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
 		}
 	}
+
+
 }

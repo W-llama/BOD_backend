@@ -64,6 +64,15 @@ public class UserController {
 			HttpStatus.OK.value(), "회원탈퇴가 완료되었습니다.", null));
 	}
 
+	@GetMapping("/users/profile")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getProfile(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.getProfile(userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
+	}
+
 	@PutMapping("/users/profile")
 	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfile(
 		@RequestBody @Valid ProfileRequestDto profileRequestDto,

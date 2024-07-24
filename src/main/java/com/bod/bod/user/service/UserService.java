@@ -24,6 +24,9 @@ public interface UserService {
 	@Transactional
 	void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response);
 
+	@Transactional(readOnly = true)
+	UserResponseDto getProfile(User user);
+
 	@Transactional
 	UserResponseDto editProfile(ProfileRequestDto profileRequestDto, User user);
 }
