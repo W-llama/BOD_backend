@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_TOKEN(400, "토큰이 일치하지 않습니다."),
     INVALID_USER_STATUS(400, "회원 탈퇴한 유저입니다."),
     INVALID_USERNAME(400, "아이디가 일치하지 않습니다."),
+    INVALID_NEW_PASSWORD(400, "최근 3개의 비밀번호와 일치함으로 변경할 수 없습니다."),
 
     NOT_FOUND_CHALLENGE(404, "해당 챌린지는 존재하지 않습니다."),
 

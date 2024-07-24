@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class ProfileRequestDto {
+public class EditProfileRequestDto {
 
 	@NotBlank(message = "Nickname is mandatory")
 	@Size(min = 3, max = 13, message = "Nickname must be between 3 and 13 characters")

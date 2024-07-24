@@ -3,17 +3,14 @@ package com.bod.bod.user.service;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
-import com.bod.bod.user.dto.LoginRequestDto;
-import com.bod.bod.user.dto.ProfileRequestDto;
-import com.bod.bod.user.dto.SignUpRequestDto;
-import com.bod.bod.user.dto.UserResponseDto;
-import com.bod.bod.user.entity.User;
-import com.bod.bod.user.entity.UserRole;
-import com.bod.bod.user.entity.UserStatus;
-import com.bod.bod.user.repository.UserRepository;
+import com.bod.bod.user.dto.*;
+import com.bod.bod.user.entity.*;
+import com.bod.bod.user.repository.*;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
+	private final UserPasswordHistoryRepository userPasswordHistoryRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
@@ -42,6 +40,7 @@ public class UserServiceImpl implements UserService {
 		checkExistingUserOrEmail(signUpRequestDto);
 		User user = createUser(signUpRequestDto);
 		userRepository.save(user);
+		savePasswordHistory(user, signUpRequestDto.getPassword());
 	}
 
 	@Override
@@ -73,15 +72,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response) {
-		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
-			throw new GlobalException(ErrorCode.INVALID_USERNAME);
-		}
-		if (user.getUserStatus() == UserStatus.WITHDRAW) {
-			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
-		}
-
-		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
-
+		validateWithdrawalRequest(loginRequestDto, user);
 		user.changeUserStatus(UserStatus.WITHDRAW);
 		refreshTokenService.deleteByUserId(user.getId());
 		jwtUtil.clearAuthToken(response);
@@ -91,37 +82,31 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public UserResponseDto getProfile(User user) {
+		validateActiveUserStatus(user);
 		return new UserResponseDto(user);
 	}
 
 	@Override
 	@Transactional
-	public UserResponseDto editProfile(ProfileRequestDto profileRequestDto, User user) {
-		if (!profileRequestDto.getNickname().equals(user.getNickname())) {
-			checkExistingNickname(profileRequestDto.getNickname());
-			user.changeNickname(profileRequestDto.getNickname());
-		}
-		user.changeIntroduce(profileRequestDto.getIntroduce());
-		user.changeImage(profileRequestDto.getImage());
+	public UserResponseDto editProfile(EditProfileRequestDto profileRequestDto, User user) {
+		validateActiveUserStatus(user);
+		updateProfile(profileRequestDto, user);
 		userRepository.save(user);
-
 		return new UserResponseDto(user);
 	}
 
-	private User createUser(SignUpRequestDto signUpRequestDto) {
-		UserRole userRole = determineUserRole(signUpRequestDto);
+	@Override
+	@Transactional
+	public UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user) {
+		validateActiveUserStatus(user);
+		User userWithHistories = userRepository.findById(user.getId())
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-		return User.builder()
-			.username(signUpRequestDto.getUsername())
-			.email(signUpRequestDto.getEmail())
-			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
-			.name(signUpRequestDto.getName())
-			.nickname(signUpRequestDto.getNickname())
-			.introduce(signUpRequestDto.getIntroduce())
-			.image(signUpRequestDto.getImage())
-			.userStatus(UserStatus.ACTIVE)
-			.userRole(userRole)
-			.build();
+		validateUserPassword(editPasswordRequestDto.getOldPassword(), userWithHistories.getPassword());
+		validateNewPassword(editPasswordRequestDto.getNewPassword(), userWithHistories);
+		userWithHistories.changePassword(passwordEncoder.encode(editPasswordRequestDto.getNewPassword()));
+		savePasswordHistory(userWithHistories, editPasswordRequestDto.getNewPassword());
+		return new UserResponseDto(userWithHistories);
 	}
 
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
@@ -159,25 +144,38 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	private User createUser(SignUpRequestDto signUpRequestDto) {
+		UserRole userRole = determineUserRole(signUpRequestDto);
+		return User.builder()
+			.username(signUpRequestDto.getUsername())
+			.email(signUpRequestDto.getEmail())
+			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
+			.name(signUpRequestDto.getName())
+			.nickname(signUpRequestDto.getNickname())
+			.introduce(signUpRequestDto.getIntroduce())
+			.image(signUpRequestDto.getImage())
+			.userStatus(UserStatus.ACTIVE)
+			.userRole(userRole)
+			.build();
+	}
+
 	private User validateLoginRequest(LoginRequestDto loginRequestDto) {
 		User user = findActiveUserByUsername(loginRequestDto.getUsername());
-
-		if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
-			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
-		}
-
+		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
 		return user;
 	}
 
 	private User findActiveUserByUsername(String username) {
 		User user = userRepository.findByUsername(username)
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+		validateActiveUserStatus(user);
+		return user;
+	}
 
+	private void validateActiveUserStatus(User user) {
 		if (user.getUserStatus() == UserStatus.WITHDRAW) {
 			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
 		}
-
-		return user;
 	}
 
 	private void validateUserPassword(String rawPassword, String encodedPassword) {
@@ -186,5 +184,46 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	private void validateWithdrawalRequest(LoginRequestDto loginRequestDto, User user) {
+		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
+			throw new GlobalException(ErrorCode.INVALID_USERNAME);
+		}
+		validateActiveUserStatus(user);
+		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
+	}
 
+	private void updateProfile(EditProfileRequestDto profileRequestDto, User user) {
+		if (!profileRequestDto.getNickname().equals(user.getNickname())) {
+			checkExistingNickname(profileRequestDto.getNickname());
+			user.changeNickname(profileRequestDto.getNickname());
+		}
+		user.changeIntroduce(profileRequestDto.getIntroduce());
+		user.changeImage(profileRequestDto.getImage());
+	}
+
+	private void validateNewPassword(String newPassword, User user) {
+		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserOrderByChangedAtDesc(user);
+		for (UserPasswordHistory passwordHistory : passwordHistories) {
+			if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {
+				throw new GlobalException(ErrorCode.INVALID_NEW_PASSWORD);
+			}
+		}
+	}
+
+	private void savePasswordHistory(User user, String password) {
+		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserOrderByChangedAtDesc(user);
+		if (passwordHistories.size() >= 3) {
+			UserPasswordHistory oldestPasswordHistory = userPasswordHistoryRepository.findByUserIdAndChangedAt(user.getId(),
+				passwordHistories.get(2).getChangedAt());
+
+			userPasswordHistoryRepository.delete(oldestPasswordHistory);
+		}
+		UserPasswordHistory userPasswordHistory = UserPasswordHistory.builder()
+			.user(user)
+			.password(passwordEncoder.encode(password))
+			.changedAt(LocalDateTime.now())
+			.build();
+
+		userPasswordHistoryRepository.save(userPasswordHistory);
+	}
 }
