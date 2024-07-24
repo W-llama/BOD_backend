@@ -20,31 +20,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ChallengeController {
 
-    private final ChallengeService challengeService;
+	private final ChallengeService challengeService;
 
-    @GetMapping("/challenges/category")
-    public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getChallengeListByCategory(
-        @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam Category category) {
-        List<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(page - 1, category);
-        return ResponseEntity.ok().body(new CommonResponseDto<>
-            (HttpStatus.OK.value(), "카테고리별 챌린지 조회 성공", challengeList));
-    }
+	@GetMapping("/challenges/category")
+	public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getChallengeListByCategory(
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam Category category
+	) {
+		List<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(page - 1, category);
+		return ResponseEntity.ok().body(new CommonResponseDto<>
+			(HttpStatus.OK.value(), "카테고리별 챌린지 조회 성공", challengeList));
+	}
 
-    @GetMapping("/challenges")
-    public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
-        @RequestParam(value = "page", defaultValue = "1") int page) {
-        List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(page - 1);
-        return ResponseEntity.ok().body(new CommonResponseDto<>
-            (HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
-    }
+	@GetMapping("/challenges")
+	public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
+		@RequestParam(value = "page", defaultValue = "1") int page
+	) {
+		List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(page - 1);
+		return ResponseEntity.ok().body(new CommonResponseDto<>
+			(HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
+	}
 
-    @GetMapping("/challenges/{challengeId}")
-    public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getChallengeDetails(
-        @PathVariable("challengeId") Long challengeId) {
-        ChallengeResponseDto challenge = challengeService.getChallengeDetails(challengeId);
-        return ResponseEntity.ok().body(new CommonResponseDto<>
-            (HttpStatus.OK.value(), "챌린지 단건 조회 성공", challenge));
-    }
+	@GetMapping("/challenges/{challengeId}")
+	public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getChallengeDetails(
+		@PathVariable("challengeId") Long challengeId
+	) {
+		ChallengeResponseDto challenge = challengeService.getChallengeDetails(challengeId);
+		return ResponseEntity.ok().body(new CommonResponseDto<>
+			(HttpStatus.OK.value(), "챌린지 단건 조회 성공", challenge));
+	}
 
 }
