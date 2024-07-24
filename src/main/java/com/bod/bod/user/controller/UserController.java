@@ -3,7 +3,9 @@ package com.bod.bod.user.controller;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.user.dto.LoginRequestDto;
+import com.bod.bod.user.dto.ProfileRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
+import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +28,8 @@ public class UserController {
 		@RequestBody @Valid SignUpRequestDto signUpRequestDto
 	) {
 		userService.signUp(signUpRequestDto);
-		return ResponseEntity.ok().body(new CommonResponseDto<>(HttpStatus.OK.value(), "회원가입이 완료되었습니다.", null));
+		return ResponseEntity.ok().body(new CommonResponseDto<>
+			(HttpStatus.OK.value(), "회원가입이 완료되었습니다.", null));
 	}
 
 	@PostMapping("/login")
@@ -59,5 +62,24 @@ public class UserController {
 		userService.withdraw(loginRequestDto, userDetails.getUser(), response);
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "회원탈퇴가 완료되었습니다.", null));
+	}
+
+	@GetMapping("/users/profile")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getProfile(
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.getProfile(userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
+	}
+
+	@PutMapping("/users/profile")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfile(
+		@RequestBody @Valid ProfileRequestDto profileRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.editProfile(profileRequestDto, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "회원정보 수정이 완료되었습니다.", userResponseDto));
 	}
 }
