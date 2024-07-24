@@ -9,8 +9,6 @@ import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
-import com.bod.bod.challenge.dto.ChallengeCreateRequestDto;
-import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.repository.ChallengeRepository;
 import com.bod.bod.global.exception.ErrorCode;
@@ -84,8 +82,16 @@ public class AdminService {
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        challenge.setChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(), reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
+        challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(), reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
 
         return new AdminChallengeUpdateResponseDto(challenge);
+    }
+
+    @Transactional
+    public void deleteChallenge(long challengeId) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+        challengeRepository.delete(challenge);
     }
 }
