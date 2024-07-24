@@ -2,6 +2,8 @@ package com.bod.bod.admin.controller;
 
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,5 +73,15 @@ public class AdminController {
         AdminChallengeCreateResponseDto resDto = adminService.createChallenge(reqDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 등록에 성공하였습니다!", resDto));
+    }
+
+    @PatchMapping("/admins/challenges/{challengeId}")
+    public ResponseEntity<CommonResponseDto<AdminChallengeUpdateResponseDto>> updateChallenge(
+        @PathVariable(name = "challengeId") Long challengeId,
+        @Valid @RequestBody AdminChallengeUpdateRequestDto reqDto
+    ) {
+       AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto);
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 수정에 성공하였습니다!", resDto));
     }
 }

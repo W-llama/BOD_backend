@@ -2,6 +2,8 @@ package com.bod.bod.admin.service;
 
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
+import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
@@ -75,5 +77,15 @@ public class AdminService {
         Challenge savedChallenge = challengeRepository.save(challenge);
 
         return new AdminChallengeCreateResponseDto(savedChallenge);
+    }
+
+    @Transactional
+    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto) {
+        Challenge challenge = challengeRepository.findById(challengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
+
+        challenge.setChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(), reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
+
+        return new AdminChallengeUpdateResponseDto(challenge);
     }
 }
