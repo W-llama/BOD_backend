@@ -4,7 +4,9 @@ import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
 import com.bod.bod.user.dto.LoginRequestDto;
+import com.bod.bod.user.dto.ProfileRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
+import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.entity.UserStatus;
@@ -40,7 +42,6 @@ public class UserServiceImpl implements UserService {
 		checkExistingUserOrEmail(signUpRequestDto);
 		User user = createUser(signUpRequestDto);
 		userRepository.save(user);
-
 	}
 
 	@Override
@@ -53,19 +54,52 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
-		validateTokenOwnership(request, user);
-		refreshTokenService.deleteByUserId(user.getId());
-		jwtUtil.clearAuthToken(response);
+		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
+		if (token != null) {
+			Claims claims = jwtUtil.getUserInfoFromToken(token);
+			String tokenUsername = claims.getSubject();
+
+			if (!user.getUsername().equals(tokenUsername)) {
+				throw new GlobalException(ErrorCode.INVALID_TOKEN);
+			}
+
+			refreshTokenService.deleteByUserId(user.getId());
+			jwtUtil.clearAuthToken(response);
+		} else {
+			throw new GlobalException(ErrorCode.INVALID_TOKEN);
+		}
 	}
 
 	@Override
 	@Transactional
 	public void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response) {
-		validateUserOwnership(loginRequestDto, user);
-		user.setUserStatus(UserStatus.WITHDRAW);
+		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
+			throw new GlobalException(ErrorCode.INVALID_USERNAME);
+		}
+		if (user.getUserStatus() == UserStatus.WITHDRAW) {
+			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
+		}
+
+		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
+
+		user.changeUserStatus(UserStatus.WITHDRAW);
 		refreshTokenService.deleteByUserId(user.getId());
 		jwtUtil.clearAuthToken(response);
 		userRepository.save(user);
+	}
+
+	@Override
+	@Transactional
+	public UserResponseDto editProfile(ProfileRequestDto profileRequestDto, User user) {
+		if (!profileRequestDto.getNickname().equals(user.getNickname())) {
+			checkExistingNickname(profileRequestDto.getNickname());
+			user.changeNickname(profileRequestDto.getNickname());
+		}
+		user.changeIntroduce(profileRequestDto.getIntroduce());
+		user.changeImage(profileRequestDto.getImage());
+		userRepository.save(user);
+
+		return new UserResponseDto(user);
 	}
 
 	private User createUser(SignUpRequestDto signUpRequestDto) {
@@ -84,7 +118,6 @@ public class UserServiceImpl implements UserService {
 			.build();
 	}
 
-
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
 		checkExistingField(userRepository.findByUsername(signUpRequestDto.getUsername()), ErrorCode.ALREADY_USERNAME);
 		checkExistingField(userRepository.findByEmail(signUpRequestDto.getEmail()), ErrorCode.DUPLICATE_EMAIL);
@@ -92,13 +125,18 @@ public class UserServiceImpl implements UserService {
 
 	private void checkExistingField(Optional<User> existingField, ErrorCode errorCode) {
 		if (existingField.isPresent()) {
-			User user = existingField.get();
-			if (user.getUserStatus() == UserStatus.WITHDRAW) {
+			if (existingField.get().getUserStatus() == UserStatus.WITHDRAW) {
 				throw new GlobalException(ErrorCode.ALREADY_WITHDRAWN);
 			} else {
 				throw new GlobalException(errorCode);
 			}
 		}
+	}
+
+	private void checkExistingNickname(String nickname) {
+		userRepository.findByNickname(nickname).ifPresent(existingUser -> {
+			throw new GlobalException(ErrorCode.ALREADY_NICKNAME);
+		});
 	}
 
 	private UserRole determineUserRole(SignUpRequestDto signUpRequestDto) {
@@ -117,7 +155,11 @@ public class UserServiceImpl implements UserService {
 
 	private User validateLoginRequest(LoginRequestDto loginRequestDto) {
 		User user = findActiveUserByUsername(loginRequestDto.getUsername());
-		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
+
+		if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
+		}
+
 		return user;
 	}
 
@@ -128,6 +170,7 @@ public class UserServiceImpl implements UserService {
 		if (user.getUserStatus() == UserStatus.WITHDRAW) {
 			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
 		}
+
 		return user;
 	}
 
@@ -135,28 +178,5 @@ public class UserServiceImpl implements UserService {
 		if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
 			throw new GlobalException(ErrorCode.INVALID_PASSWORD);
 		}
-	}
-
-	private void validateTokenOwnership(HttpServletRequest request, User user) {
-		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
-		if (token != null) {
-			Claims claims = jwtUtil.getUserInfoFromToken(token);
-			String tokenUsername = claims.getSubject();
-			if (!user.getUsername().equals(tokenUsername)) {
-				throw new GlobalException(ErrorCode.INVALID_TOKEN);
-			}
-		} else {
-			throw new GlobalException(ErrorCode.INVALID_TOKEN);
-		}
-	}
-
-	private void validateUserOwnership(LoginRequestDto loginRequestDto, User user) {
-		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
-			throw new GlobalException(ErrorCode.INVALID_USERNAME);
-		}
-		if (user.getUserStatus() == UserStatus.WITHDRAW) {
-			throw new GlobalException(ErrorCode.INVALID_USER_STATUS);
-		}
-		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
 	}
 }

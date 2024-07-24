@@ -48,7 +48,7 @@ public class AdminService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-        user.setName(requestDto.getName());
+        user.changeName(requestDto.getName());
 
         return new AdminUserUpdateResponseDto(user);
     }
@@ -58,7 +58,7 @@ public class AdminService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-        user.setUserStatus(requestDto.getUserStatus());
+        user.changeUserStatus(requestDto.getUserStatus());
 
         return new AdminUserStatusUpdateResponseDto(user);
     }

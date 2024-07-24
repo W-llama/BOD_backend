@@ -52,8 +52,8 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
 	}
 
 	private OAuth2User updateUser(User existingUser, OAuth2ResponseDto oAuth2ResponseDto) {
-		existingUser.setEmail(oAuth2ResponseDto.getEmail());
-		existingUser.setName(oAuth2ResponseDto.getName());
+		existingUser.changeEmail(oAuth2ResponseDto.getEmail());
+		existingUser.changeName(oAuth2ResponseDto.getName());
 
 		userRepository.save(existingUser);
 

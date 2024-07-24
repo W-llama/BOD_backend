@@ -42,7 +42,7 @@ public class SignUpRequestDto {
 	)
 	private String nickname;
 
-	@Size(min = 5, max = 100)
+	@Size(max = 255, message = "Introduce must be less than 255 characters")
 	private String introduce;
 
 	private String image;
