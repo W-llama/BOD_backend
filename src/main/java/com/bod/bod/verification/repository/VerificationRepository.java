@@ -1,5 +1,6 @@
 package com.bod.bod.verification.repository;
 
+import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.verification.entity.Verification;
@@ -14,5 +15,5 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
 		()-> new GlobalException(ErrorCode.NOT_FOUND_VERIFICATION));
   }
 
-    Page<Verification> findByChallengeId(Long challengeId, Pageable pageable);
+    Page<AdminVerificationGetResponse> findAllByChallengeId(long challengeId, Pageable pageable);
 }
