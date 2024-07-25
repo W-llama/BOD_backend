@@ -15,6 +15,7 @@ import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,12 +44,23 @@ public class VerificationService {
 
       Challenge challenge = challengeService.findChallengeById(challengeId);
 
+      LocalDateTime currentDate = LocalDateTime.now();
+      LocalDateTime startOfDay = currentDate.toLocalDate().atStartOfDay();
+      LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+      List<Verification> existingVerificationList = verificationRepository.findByCreatedAtBetweenAndUser(startOfDay, endOfDay, user);
+
+      if(!existingVerificationList.isEmpty()) {
+        throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
+      }
+
       Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), challenge, user);
       verificationRepository.save(verification);
-      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
 
+      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
       VerificationResponseDto responseDto = new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
       return responseDto;
+
     } catch(IOException e) {
       throw new FileUploadFailureException("파일 업로드 실패");
     }
