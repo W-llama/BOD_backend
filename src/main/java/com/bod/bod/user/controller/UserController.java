@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -92,5 +93,15 @@ public class UserController {
 		UserResponseDto userResponseDto = userService.editPassword(editPasswordRequestDto, userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "비밀번호 수정이 완료되었습니다.", userResponseDto));
+	}
+
+	@PutMapping("/users/profile/image")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfileImage(
+		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.editProfileImage(profileImage, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "프로필 이미지 수정이 완료되었습니다.", userResponseDto));
 	}
 }

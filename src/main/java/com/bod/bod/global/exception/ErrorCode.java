@@ -29,7 +29,9 @@ public enum ErrorCode {
     EMPTY_VERIFICATION(404, "해당 챌린지에는 현재까지 인증 신청 내역이 없습니다."),
     ACCESS_DENIED_VERIFICATION(403, "해당 인증에 대한 수정/삭제 권한이 없는 유저입니다."),
     ALREADY_EXISTS_VERIFICATION(404, "이미 챌린지 인증을 하였습니다."),
-    NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다.");
+    NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다."),
+    FILE_UPLOAD_ERROR(500, "파일 업로드를 실패하였습니다." ),
+    FILE_CONVERSION_ERROR(500,"파일 업로드를 실패하였습니다.");
 
 
 

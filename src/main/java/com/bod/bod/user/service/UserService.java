@@ -9,6 +9,7 @@ import com.bod.bod.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -17,7 +18,6 @@ public interface UserService {
 
 	@Transactional
 	void login(LoginRequestDto loginRequestDto, HttpServletResponse response);
-
 
 	@Transactional
 	void logout(HttpServletRequest request, HttpServletResponse response, User user);
@@ -30,6 +30,9 @@ public interface UserService {
 
 	@Transactional
 	UserResponseDto editProfile(EditProfileRequestDto editProfileRequestDto, User user);
+
+	@Transactional
+	UserResponseDto editProfileImage(MultipartFile profileImage, User user);
 
 	@Transactional
 	UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user);
