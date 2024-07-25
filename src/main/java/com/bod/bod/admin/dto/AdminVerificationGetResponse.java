@@ -13,7 +13,7 @@ public class AdminVerificationGetResponse {
     private String content;
 
     public AdminVerificationGetResponse(Verification verification) {
-        this.image = verification.getImage();
+        this.image = verification.getImageUrl();
         this.title = verification.getTitle();
         this.content = verification.getContent();
     }

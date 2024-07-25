@@ -1,5 +1,6 @@
 package com.bod.bod.verification.dto;
 
+import com.bod.bod.verification.entity.Verification;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,11 +13,11 @@ public class VerificationWithUserResponseDto {
   private String image;
   private String name;
 
-  public VerificationWithUserResponseDto(Long verificationId, String title, String content, String image, String name) {
-	this.verificationId = verificationId;
-	this.title = title;
-	this.content = content;
-	this.image = image;
-	this.name = name;
+  public VerificationWithUserResponseDto(Verification verification) {
+	this.verificationId = verification.getId();
+	this.title = verification.getTitle();
+	this.content = verification.getContent();
+	this.image = verification.getImageUrl();
+	this.name = verification.getUser().getName();
   }
 }

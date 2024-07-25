@@ -39,8 +39,11 @@ public class Verification extends TimeStamp {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(nullable = false)
+    private String imageName;
+
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String image;
+    private String imageUrl;
 
     @Column(nullable = false)
     private String title;
@@ -52,10 +55,11 @@ public class Verification extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    public Verification(String title, String content, String image, Challenge challenge, User user) {
+    public Verification(String title, String content, String imageName, String imageUrl, Challenge challenge, User user) {
         this.title = title;
         this.content = content;
-        this.image = image;
+        this.imageName = imageName;
+        this.imageUrl = imageUrl;
         this.status = Status.PENDING;
         this.challenge = challenge;
         this.user = user;

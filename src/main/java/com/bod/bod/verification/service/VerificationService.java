@@ -54,10 +54,10 @@ public class VerificationService {
         throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
       }
 
-      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), challenge, user);
+      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
+      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
       verificationRepository.save(verification);
 
-      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
       VerificationResponseDto responseDto = new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
       return responseDto;
 
@@ -70,7 +70,7 @@ public class VerificationService {
   public void cancelVerification(Long verificationId, User user) {
     Verification verification = findVerificationById(verificationId);
     verification.checkUser(user);
-    DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, verification.getImage());
+    DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, verification.getImageName());
     amazonS3Client.deleteObject(request);
     verificationRepository.delete(verification);
   }
