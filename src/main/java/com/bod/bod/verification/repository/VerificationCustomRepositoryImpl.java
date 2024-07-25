@@ -25,12 +25,7 @@ public class VerificationCustomRepositoryImpl implements VerificationCustomRepos
 	Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 
 	List<VerificationWithUserResponseDto> verificationList = queryFactory
-		.select(Projections.constructor(VerificationWithUserResponseDto.class,
-			verification.id,
-			verification.title,
-			verification.content,
-			verification.image,
-			verification.user.name))
+		.select(Projections.constructor(VerificationWithUserResponseDto.class, verification))
 		.from(verification)
 		.where(verification.challenge.id.eq(challengeId))
 		.orderBy(verification.createdAt.desc())
