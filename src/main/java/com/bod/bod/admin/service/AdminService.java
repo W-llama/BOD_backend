@@ -34,15 +34,14 @@ public class AdminService {
     private final ChallengeRepository challengeRepository;
     private final VerificationRepository verificationRepository;
 
-    public Page<AdminUsersResponseDto> getAllUsers(int page, int size, String sortBy, boolean isAsc) {
+    public Page<User> getAllUsers(int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<User> userList;
-        userList = userRepository.findAll(pageable);
-
-        return userList.map(AdminUsersResponseDto::new);
+//        Page<User> userList = userRepository.findAll(pageable);
+//        return userList.map(AdminUsersResponseDto::new);
+        return userRepository.findAll(pageable);
     }
 
     @Transactional
@@ -109,9 +108,7 @@ public class AdminService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Verification> verifications;
-        verifications = verificationRepository.findByChallengeId(chellengeId, pageable);
 
-        return verifications.map(AdminVerificationGetResponse::new);
+        return verificationRepository.findAllByChallengeId(chellengeId,pageable);
     }
 }
