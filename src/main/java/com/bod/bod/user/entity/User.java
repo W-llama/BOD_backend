@@ -1,5 +1,6 @@
 package com.bod.bod.user.entity;
 
+import com.bod.bod.challenge.entity.UserChallenge;
 import com.bod.bod.global.TimeStamp;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -60,6 +61,10 @@ public class User extends TimeStamp {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPasswordHistory> passwordHistories = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserChallenge> userChallenges = new ArrayList<>();
 
     public void changeEmail(String email) {
         this.email = email;
