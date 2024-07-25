@@ -39,7 +39,7 @@ public class Verification extends TimeStamp {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String image;
 
     @Column(nullable = false)
