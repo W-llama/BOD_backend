@@ -73,7 +73,7 @@ public class ChallengeController {
 			(HttpStatus.OK.value(),"챌린지 등록 성공",challenge));
 	}
 
-	@GetMapping("/ challenges/{challengeId}/users")
+	@GetMapping("/challenges/{challengeId}/users")
 	public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getUserToChallenges(
 		@PathVariable("challengeId") Long challengeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
