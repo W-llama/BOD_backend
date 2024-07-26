@@ -1,7 +1,7 @@
-package com.bod.bod.challenge.repository;
+package com.bod.bod.userchallenge.repository;
 
 import com.bod.bod.challenge.entity.Challenge;
-import com.bod.bod.challenge.entity.UserChallenge;
+import com.bod.bod.userchallenge.entity.UserChallenge;
 import com.bod.bod.user.entity.User;
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +13,5 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     List<UserChallenge> findByUserIdAndChallengeId(long userId, long challengeId);
 
+    List<UserChallenge> findByChallenge(Challenge challenge);
 }

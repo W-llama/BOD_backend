@@ -1,5 +1,6 @@
-package com.bod.bod.challenge.entity;
+package com.bod.bod.userchallenge.entity;
 
+import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.TimeStamp;
 import com.bod.bod.user.entity.User;
 import jakarta.persistence.*;
@@ -8,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
