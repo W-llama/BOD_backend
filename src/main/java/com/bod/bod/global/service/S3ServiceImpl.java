@@ -26,7 +26,7 @@ public class S3ServiceImpl {
 
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
-
+	
 	public String upload(MultipartFile multipartFile) throws IOException {
 		File uploadFile = convertToFile(multipartFile)
 			.orElseThrow(() -> new GlobalException(ErrorCode.FILE_CONVERSION_ERROR));
