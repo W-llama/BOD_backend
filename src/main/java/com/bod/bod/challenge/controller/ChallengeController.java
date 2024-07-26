@@ -2,6 +2,7 @@ package com.bod.bod.challenge.controller;
 
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
+import com.bod.bod.challenge.dto.ChallengeUserListDto;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.service.ChallengeService;
 import com.bod.bod.global.dto.CommonResponseDto;
@@ -30,7 +31,8 @@ public class ChallengeController {
 		@RequestParam(value = "page", defaultValue = "1") int page,
 		@RequestParam Category category
 	) {
-		List<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(page - 1, category);
+		List<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(
+			page - 1, category);
 		return ResponseEntity.ok().body(new CommonResponseDto<>
 			(HttpStatus.OK.value(), "카테고리별 챌린지 조회 성공", challengeList));
 	}
@@ -39,7 +41,8 @@ public class ChallengeController {
 	public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
 		@RequestParam(value = "page", defaultValue = "1") int page
 	) {
-		List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(page - 1);
+		List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(
+			page - 1);
 		return ResponseEntity.ok().body(new CommonResponseDto<>
 			(HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
 	}
@@ -57,26 +60,25 @@ public class ChallengeController {
 	public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> addChallenge(
 		@PathVariable("challengeId") Long challengeId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
-	){
+	) {
 		//로그인 한 유저정보
-		String username = userDetails.getUsername();
-		ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId,username);
-
-		return ResponseEntity.ok().body(new CommonResponseDto<>
-			(HttpStatus.OK.value(),"챌린지 등록 성공",challenge));
-	}
-
-	@GetMapping("/challenges/{challengeId}/users")
-	public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getUserToChallenges(
-		@PathVariable("challengeId") Long challengeId,
-		@AuthenticationPrincipal UserDetailsImpl userDetails
-	){
 		String username = userDetails.getUsername();
 		ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId, username);
 
 		return ResponseEntity.ok().body(new CommonResponseDto<>
-			(HttpStatus.OK.value(), "유저가 선택한 챌린지 조회 성공",challenge));
+			(HttpStatus.OK.value(), "챌린지 등록 성공", challenge));
 	}
 
+	@GetMapping("/challenges/{challengeId}/users")
+	public ResponseEntity<CommonResponseDto<List<ChallengeUserListDto>>>getUserByChallenges(
+		@PathVariable("challengeId") Long challengeId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		String username = userDetails.getUsername();
+		List<ChallengeUserListDto> userList = challengeService.getChallengesByUser(challengeId, username);
 
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "선택한 챌린지의 유저 조회 성공", userList
+		));
+	}
 }

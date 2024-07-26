@@ -2,6 +2,7 @@ package com.bod.bod.challenge.service;
 
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
+import com.bod.bod.challenge.dto.ChallengeUserListDto;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.userchallenge.entity.UserChallenge;
@@ -69,28 +70,14 @@ public class ChallengeService {
         return new ChallengeResponseDto(challenge);
     }
 
-    public List<ChallengeSummaryResponseDto> getUserToChallenges(Long challengeId, String username){
-
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(()-> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+    public List<ChallengeUserListDto> getChallengesByUser(Long challengeId, String username) {
 
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
 
-        List<UserChallenge> userChallenges = userChallengeRepository.findByUserIdAndChallengeId(user.getId(), challenge.getId());
+        List<UserChallenge> userChallenges = userChallengeRepository.findByChallengeId(challenge.getId());
 
         return userChallenges.stream()
-            .map(userChallenge -> new ChallengeSummaryResponseDto(userChallenge.getChallenge()))
-            .toList();
-    }
-
-    public List<User> getUsersByChallenge(Long challengeId) {
-
-        Challenge challenge = challengeRepository.findChallengeById(challengeId);
-
-        List<UserChallenge> userChallenges = userChallengeRepository.findByChallenge(challenge);
-
-        return userChallenges.stream()
-            .map(UserChallenge::getUser)
+            .map(userChallenge -> new ChallengeUserListDto(challenge, userChallenge.getUser()))
             .toList();
     }
 }
