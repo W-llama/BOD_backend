@@ -97,7 +97,8 @@ public class AdminController {
         @PathVariable(name = "challengeId") Long challengeId
     ) {
         adminService.deleteChallenge(challengeId);
-        return ResponseEntity.ok().body(new CommonResponseDto<>(HttpStatus.OK.value(), "챌린지 삭제에 성공하였습니다!", null));
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 삭제에 성공하였습니다!", null));
     }
 
     @GetMapping("/admins/challenges/{challengeId}/verifications")
@@ -116,5 +117,23 @@ public class AdminController {
 
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청 목록 조회에 성공하였습니다!", verifications));
+    }
+
+    @PutMapping("/admins/verifications/{verificationId}/approve")
+    public ResponseEntity<CommonResponseDto<Void>> approveVerification(
+        @PathVariable(name = "verificationId") Long verificationId
+    ) {
+        adminService.approveVerification(verificationId);
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 인증 요청을 승인하였습니다!", null));
+    }
+
+    @PutMapping("/admins/verifications/{verificationId}/reject")
+    public ResponseEntity<CommonResponseDto<Void>> rejectVerification(
+        @PathVariable(name = "verificationId") Long verificationId
+    ) {
+        adminService.rejectVerification(verificationId);
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 인증 요청을 거절하였습니다!", null));
     }
 }

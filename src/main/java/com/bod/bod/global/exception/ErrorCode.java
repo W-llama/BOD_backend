@@ -33,6 +33,8 @@ public enum ErrorCode {
     ALREADY_EXISTS_VERIFICATION(409, "이미 챌린지 인증을 하였습니다."),
     NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다."),
     DUPLICATE_CHALLENGE(409,"이미 신청한 챌린지입니다." ),
+    ALREADY_EXISTS_APPROVE_VERIFICATION(409, "이미 챌린지 인증 요청을 승인하였습니다."),
+    ALREADY_EXISTS_REJECT_VERIFICATION(409, "이미 챌린지 인증 요청을 거절하였습니다."),
 
     // File-related errors
     FILE_UPLOAD_ERROR(500, "파일 크기가 너무 큽니다."),

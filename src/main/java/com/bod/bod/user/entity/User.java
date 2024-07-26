@@ -45,6 +45,7 @@ public class User extends TimeStamp {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
+    @Builder.Default
     @Column(name = "point")
     private Long point = 0L;
 
@@ -82,6 +83,14 @@ public class User extends TimeStamp {
 
     public void changePassword(String password) {
         this.password = password;
+    }
+
+    public void increasePoint() {
+        this.point += 500L;
+    }
+
+    public void decreasePoint() {
+        this.point -= 500L;
     }
 
 }
