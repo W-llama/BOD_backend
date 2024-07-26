@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-
     // Authorization errors
     ACCESS_DENIED(403, "접근 권한이 없습니다."),
 

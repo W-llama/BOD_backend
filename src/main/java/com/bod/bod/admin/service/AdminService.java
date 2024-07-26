@@ -39,8 +39,6 @@ public class AdminService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-//        Page<User> userList = userRepository.findAll(pageable);
-//        return userList.map(AdminUsersResponseDto::new);
         return userRepository.findAll(pageable);
     }
 
