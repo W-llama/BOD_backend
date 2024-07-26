@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-
     // Authorization errors
     ACCESS_DENIED(403, "접근 권한이 없습니다."),
 
@@ -35,7 +34,7 @@ public enum ErrorCode {
     NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다."),
 
     // File-related errors
-    FILE_UPLOAD_ERROR(500, "파일 업로드에 실패하였습니다."),
+    FILE_UPLOAD_ERROR(500, "파일 크기가 너무 큽니다."),
     FILE_CONVERSION_ERROR(500, "파일 변환에 실패하였습니다."),
 
     // General error

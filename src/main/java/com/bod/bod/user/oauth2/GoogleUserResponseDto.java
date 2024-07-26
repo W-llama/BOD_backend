@@ -2,7 +2,7 @@ package com.bod.bod.user.oauth2;
 
 import java.util.Map;
 
-public class GoogleUserResponseDto implements OAuth2ResponseDto{
+public class GoogleUserResponseDto implements OAuth2ResponseDto {
 
 	private final Map<String, Object> attributes;
 

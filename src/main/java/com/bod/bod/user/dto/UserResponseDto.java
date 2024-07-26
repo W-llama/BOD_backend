@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class UserResponseDto {
 
+	private final String image;
 	private final String nickname;
 	private final String introduce;
-	private final String image;
 
 	public UserResponseDto(User user) {
+		this.image = user.getImage();
 		this.nickname = user.getNickname();
 		this.introduce = user.getIntroduce();
-		this.image = user.getImage();
 	}
 }
