@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-//    private final UserRepository userRepository;
-//    private final UserChallengeRepository userChallengeRepository;
 
     public List<ChallengeSummaryResponseDto> getChallengesByCategory(int page, Category category) {
         List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeListByCategory(page, category);
@@ -43,37 +41,4 @@ public class ChallengeService {
     public Challenge findChallengeById(Long challengeId) {
         return challengeRepository.findChallengeById(challengeId);
     }
-
-//    public ChallengeResponseDto addUserToChallenge(Long challengeId, String username){
-//
-//        User user = userRepository.findByUsername(username)
-//            .orElseThrow(()-> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
-//
-//        Challenge challenge = challengeRepository.findChallengeById(challengeId);
-//
-//        Optional<UserChallenge> existingUserChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge);
-//        if(existingUserChallenge.isPresent()){
-//            throw new GlobalException(ErrorCode.DUPLICATE_CHALLENGE);
-//        }
-//        UserChallenge userChallenge = UserChallenge.builder()
-//            .user(user)
-//            .challenge(challenge)
-//            .build();
-//        userChallengeRepository.save(userChallenge);
-//        return new ChallengeResponseDto(challenge);
-//    }
-
-//    public List<ChallengeSummaryResponseDto> getUserToChallenges(Long challengeId, String username){
-//
-//        User user = userRepository.findByUsername(username)
-//            .orElseThrow(()-> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
-//
-//        Challenge challenge = challengeRepository.findChallengeById(challengeId);
-//
-//        List<UserChallenge> userChallenges = userChallengeRepository.findByUserIdAndChallengeId(user.getId(), challenge.getId());
-//
-//        return userChallenges.stream()
-//            .map(userChallenge -> new ChallengeSummaryResponseDto(userChallenge.getChallenge()))
-//            .collect(Collectors.toList());
-//    }
 }
