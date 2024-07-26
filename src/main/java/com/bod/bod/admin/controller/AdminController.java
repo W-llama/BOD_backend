@@ -13,6 +13,7 @@ import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.admin.service.AdminService;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.user.entity.User;
+import com.bod.bod.verification.entity.Verification;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -107,12 +108,12 @@ public class AdminController {
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
         @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
     ) {
-        Page<AdminVerificationGetResponse> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc);
+        Page<Verification> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc);
 
-        List<AdminVerificationGetResponse> verifications = responseDto
-            .getContent()
-            .stream()
+        List<AdminVerificationGetResponse> verifications = responseDto.stream()
+            .map(AdminVerificationGetResponse::new)
             .toList();
+
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청 목록 조회에 성공하였습니다!", verifications));
     }

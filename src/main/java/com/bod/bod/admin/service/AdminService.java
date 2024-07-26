@@ -99,16 +99,14 @@ public class AdminService {
         challengeRepository.delete(challenge);
     }
 
-    @Transactional
-    public Page<AdminVerificationGetResponse> getVerifications(long chellengeId, int page, int size, String sortBy, boolean isAsc) {
-        challengeRepository.findById(chellengeId)
+    public Page<Verification> getVerifications(long challengeId, int page, int size, String sortBy, boolean isAsc) {
+        challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-
-        return verificationRepository.findAllByChallengeId(chellengeId,pageable);
+        return verificationRepository.findAllByChallengeId(challengeId,pageable);
     }
 }
