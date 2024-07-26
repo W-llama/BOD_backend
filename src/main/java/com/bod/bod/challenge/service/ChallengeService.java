@@ -13,6 +13,7 @@ import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,5 +70,19 @@ public class ChallengeService {
             .build();
         userChallengeRepository.save(userChallenge);
         return new ChallengeResponseDto(challenge);
+    }
+
+    public List<ChallengeSummaryResponseDto> getUserToChallenges(Long challengeId, String username){
+
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(()-> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+
+        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+
+        List<UserChallenge> userChallenges = userChallengeRepository.findByUserIdAndChallengeId(user.getId(), challenge.getId());
+
+        return userChallenges.stream()
+            .map(userChallenge -> new ChallengeSummaryResponseDto(userChallenge.getChallenge()))
+            .collect(Collectors.toList());
     }
 }
