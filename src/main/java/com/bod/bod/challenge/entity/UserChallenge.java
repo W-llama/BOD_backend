@@ -12,7 +12,6 @@ import lombok.Setter;
 
 @Entity
 @Getter
-@Setter
 @Table(name = "db_userChallenges")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
