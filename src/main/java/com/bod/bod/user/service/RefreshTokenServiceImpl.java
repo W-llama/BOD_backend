@@ -26,7 +26,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 			return refreshTokenRepository.save(refreshToken);
 		} else {
 			RefreshToken refreshToken = RefreshToken.builder()
-				.user(user)
+				.userId(user.getId())
 				.token(token)
 				.expirationAt(expirationAt)
 				.build();

@@ -1,5 +1,6 @@
 package com.bod.bod.global.exception;
 
+import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.exception.dto.ExceptionResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -60,5 +62,14 @@ public class GlobalExceptionHandler {
             .path(request.getRequestURI())
             .build();
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ExceptionResponseDto> handleMaxSizeException(HttpServletRequest request, MaxUploadSizeExceededException ex) {
+        ExceptionResponseDto exceptionResponse = ExceptionResponseDto.builder()
+            .msg("파일 크기가 너무 큽니다. 최대 10MB까지 업로드할 수 있습니다.")
+            .path(request.getRequestURI())
+            .build();
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
     }
 }

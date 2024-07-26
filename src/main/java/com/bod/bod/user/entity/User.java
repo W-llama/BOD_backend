@@ -10,8 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Table(name = "db_users")
 @Getter
@@ -58,6 +56,7 @@ public class User extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserPasswordHistory> passwordHistories = new ArrayList<>();
@@ -65,6 +64,7 @@ public class User extends TimeStamp {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChallenge> userChallenges = new ArrayList<>();
+
 
     public void changeEmail(String email) {
         this.email = email;
