@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.*;
 
-@Entity
+
+@Table(name = "db_users")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "db_users")
+@Entity
 public class User extends TimeStamp {
 
     @Id
@@ -42,6 +43,7 @@ public class User extends TimeStamp {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
+    @Builder.Default
     @Column(name = "point")
     private Long point = 0L;
 
@@ -83,4 +85,13 @@ public class User extends TimeStamp {
     public void changePassword(String password) {
         this.password = password;
     }
+
+    public void increasePoint() {
+        this.point += 500L;
+    }
+
+    public void decreasePoint() {
+        this.point -= 500L;
+    }
+
 }

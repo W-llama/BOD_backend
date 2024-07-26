@@ -69,4 +69,12 @@ public class Verification extends TimeStamp {
             throw new GlobalException(ErrorCode.ACCESS_DENIED_VERIFICATION);
         } return true;
     }
+
+    public void changeStatusApprove() {
+        this.status = Status.APPROVE;
+    }
+
+    public void changeStatusReject() {
+        this.status = Status.REJECT;
+    }
 }

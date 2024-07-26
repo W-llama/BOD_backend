@@ -16,8 +16,10 @@ import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.UserRepository;
+import com.bod.bod.verification.entity.Status;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -106,5 +108,31 @@ public class AdminService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return verificationRepository.findAllByChallengeId(challengeId,pageable);
+    }
+
+    @Transactional
+    public void approveVerification(long verificationId) {
+        Verification verification = verificationRepository.findVerificationById(verificationId);
+        if (verification.getStatus().getStatus().equals("APPROVE")) {
+            throw new GlobalException(ErrorCode.ALREADY_EXISTS_APPROVE_VERIFICATION);
+        } else {
+            verification.changeStatusApprove();
+            verification.getUser().increasePoint();
+        }
+    }
+
+    @Transactional
+    public void rejectVerification(long verificationId) {
+        Verification verification = verificationRepository.findVerificationById(verificationId);
+        if (verification.getStatus().getStatus().equals("REJECT")) {
+            throw new GlobalException(ErrorCode.ALREADY_EXISTS_REJECT_VERIFICATION);
+        } else {
+            if (verification.getStatus().getStatus().equals("APPROVE")) {
+                verification.changeStatusReject();
+                verification.getUser().decreasePoint();
+            } else {
+                verification.changeStatusReject();
+            }
+        }
     }
 }
