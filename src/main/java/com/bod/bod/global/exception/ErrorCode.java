@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-//    예외(상태코드, "메세지"),  추가하여 작성하세요
 
     // Authorization errors
     ACCESS_DENIED(403, "접근 권한이 없습니다."),
@@ -37,7 +36,7 @@ public enum ErrorCode {
     DUPLICATE_CHALLENGE(409,"이미 신청한 챌린지입니다." ),
 
     // File-related errors
-    FILE_UPLOAD_ERROR(500, "파일 업로드에 실패하였습니다."),
+    FILE_UPLOAD_ERROR(500, "파일 크기가 너무 큽니다."),
     FILE_CONVERSION_ERROR(500, "파일 변환에 실패하였습니다."),
 
     // General error

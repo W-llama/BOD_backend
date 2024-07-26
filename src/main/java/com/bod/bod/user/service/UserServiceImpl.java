@@ -3,7 +3,7 @@ package com.bod.bod.user.service;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
-import com.bod.bod.global.service.S3ServiceImpl;
+import com.bod.bod.global.service.S3Service;
 import com.bod.bod.user.dto.*;
 import com.bod.bod.user.entity.*;
 import com.bod.bod.user.repository.*;
@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
-	private final S3ServiceImpl s3Service;
+	private final S3Service s3Service;
 
 	@Value("${JWT_SECRET_KEY}")
 	private String secretKey;
@@ -83,8 +83,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public UserResponseDto getProfile(User user) {
+	public UserResponseDto getMyProfile(User user) {
+		validateActiveUserStatus(user);
+		return new UserResponseDto(user);
+	}
+
+	@Override
+	public UserResponseDto getUserprofile(long userId) {
+		User user = findById(userId);
 		validateActiveUserStatus(user);
 		return new UserResponseDto(user);
 	}
@@ -129,6 +135,12 @@ public class UserServiceImpl implements UserService {
 		userWithHistories.changePassword(passwordEncoder.encode(editPasswordRequestDto.getNewPassword()));
 		savePasswordHistory(userWithHistories, editPasswordRequestDto.getNewPassword());
 		return new UserResponseDto(userWithHistories);
+	}
+
+	@Override
+	public User findById(long userId) {
+		return userRepository.findById(userId).
+			orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 	}
 
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
@@ -223,7 +235,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void validateNewPassword(String newPassword, User user) {
-		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserOrderByChangedAtDesc(user);
+		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
 		for (UserPasswordHistory passwordHistory : passwordHistories) {
 			if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {
 				throw new GlobalException(ErrorCode.INVALID_NEW_PASSWORD);
@@ -232,7 +244,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void savePasswordHistory(User user, String password) {
-		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserOrderByChangedAtDesc(user);
+		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
 		if (passwordHistories.size() >= 3) {
 			UserPasswordHistory oldestPasswordHistory = userPasswordHistoryRepository.findByUserIdAndChangedAt(user.getId(),
 				passwordHistories.get(2).getChangedAt());
@@ -240,7 +252,7 @@ public class UserServiceImpl implements UserService {
 			userPasswordHistoryRepository.delete(oldestPasswordHistory);
 		}
 		UserPasswordHistory userPasswordHistory = UserPasswordHistory.builder()
-			.user(user)
+			.userId(user.getId())
 			.password(passwordEncoder.encode(password))
 			.changedAt(LocalDateTime.now())
 			.build();

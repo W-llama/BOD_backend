@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "refresh_token")
+@Table(name = "db_refresh_token")
 @Entity
 @Getter
 @Builder
@@ -19,7 +19,7 @@ public class RefreshToken extends TimeStamp {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Long id;
 
 	@Column(nullable = false)
 	private String token;
@@ -27,9 +27,8 @@ public class RefreshToken extends TimeStamp {
 	@Column(nullable = false)
 	private LocalDateTime expirationAt;
 
-	@OneToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	@Column(name = "userId", nullable = false)
+	private Long userId;
 
 	public void updateToken(String token) {
 		this.token = token;

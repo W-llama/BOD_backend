@@ -24,9 +24,8 @@ public class UserPasswordHistory {
 	@Column(name = "password", nullable = false)
 	private String password;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	@Column(name = "userId", nullable = false)
+	private Long userId;
 
 	@Column(name = "changed_at", nullable = false)
 	private LocalDateTime changedAt;

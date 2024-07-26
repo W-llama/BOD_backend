@@ -31,7 +31,7 @@ public class UserController {
 	) {
 		userService.signUp(signUpRequestDto);
 		return ResponseEntity.ok().body(new CommonResponseDto<>
-			(HttpStatus.OK.value(), "회원가입이 완료되었습니다.", null));
+			(HttpStatus.CREATED.value(), "회원가입이 완료되었습니다.", null));
 	}
 
 	@PostMapping("/login")
@@ -52,7 +52,7 @@ public class UserController {
 	) {
 		userService.logout(request, response, userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
-			HttpStatus.OK.value(), "로그아웃이 완료되었습니다.", null));
+			HttpStatus.NO_CONTENT.value(), "로그아웃이 완료되었습니다.", null));
 	}
 
 	@DeleteMapping("/withdraw")
@@ -66,11 +66,20 @@ public class UserController {
 			HttpStatus.OK.value(), "회원탈퇴가 완료되었습니다.", null));
 	}
 
+	@GetMapping("/users/{userId}")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getUserprofile(
+		@PathVariable(name = "userId") long userId
+	) {
+		UserResponseDto userResponseDto = userService.getUserprofile(userId);
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "선택한 유저의 프로필 조회가 완료되었습니다.", userResponseDto));
+	}
+
 	@GetMapping("/users/profile")
-	public ResponseEntity<CommonResponseDto<UserResponseDto>> getProfile(
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getMyProfile(
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		UserResponseDto userResponseDto = userService.getProfile(userDetails.getUser());
+		UserResponseDto userResponseDto = userService.getMyProfile(userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
 	}
