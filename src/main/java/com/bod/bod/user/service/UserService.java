@@ -1,5 +1,6 @@
 package com.bod.bod.user.service;
 
+import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.EditProfileRequestDto;
@@ -8,6 +9,9 @@ import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Map;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +32,8 @@ public interface UserService {
 	UserResponseDto getMyProfile(User user);
 
 	UserResponseDto getUserprofile(long userId);
+
+	Map<String, Slice<ChallengeResponseDto>> getMyChallenges(User user, Pageable pageable);
 
 	@Transactional
 	UserResponseDto editProfile(EditProfileRequestDto editProfileRequestDto, User user);

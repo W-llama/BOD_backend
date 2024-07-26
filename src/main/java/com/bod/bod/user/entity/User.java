@@ -1,14 +1,12 @@
 package com.bod.bod.user.entity;
 
 import com.bod.bod.global.TimeStamp;
+import com.bod.bod.userchallenge.entity.UserChallenge;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import java.util.ArrayList;
+import java.util.List;
+import lombok.*;
 
 
 @Table(name = "db_users")
@@ -56,6 +54,9 @@ public class User extends TimeStamp {
     @Column(name = "userRole", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserChallenge> userChallenges = new ArrayList<>();
 
     public void changeEmail(String email) {
         this.email = email;

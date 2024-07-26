@@ -1,5 +1,6 @@
 package com.bod.bod.verification.repository;
 
+import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
@@ -20,4 +21,6 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
     Page<Verification> findAllByChallengeId(long challengeId, Pageable pageable);
 
     List<Verification> findByCreatedAtBetweenAndUser(LocalDateTime startDateTime, LocalDateTime endDateTime, User user);
+
+    int countByChallengeAndUser(Challenge challenge, User user);
 }

@@ -1,21 +1,34 @@
 package com.bod.bod.user.controller;
 
+import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
-import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.EditProfileRequestDto;
+import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -82,6 +95,16 @@ public class UserController {
 		UserResponseDto userResponseDto = userService.getMyProfile(userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
+	}
+
+	@GetMapping("/users/challenges")
+	public ResponseEntity<CommonResponseDto<Map<String, Slice<ChallengeResponseDto>>>> getMyChallenges(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PageableDefault Pageable pageable
+	) {
+		Map<String, Slice<ChallengeResponseDto>> challengeSlices = userService.getMyChallenges(userDetails.getUser(), pageable);
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "참여한 챌린지 목록 조회가 완료되었습니다.", challengeSlices));
 	}
 
 	@PutMapping("/users/profile")

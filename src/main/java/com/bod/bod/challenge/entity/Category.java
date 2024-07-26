@@ -1,5 +1,8 @@
 package com.bod.bod.challenge.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum Category {
 
     HEALTH(CategoryType.HEALTH),
@@ -14,9 +17,7 @@ public enum Category {
         this.category = category;
     }
 
-    public String getCategory() {return this.category;}
-
-    public static class CategoryType{
+	public static class CategoryType{
         public static final String HEALTH = "건강";
         public static final String STUDY = "학습";
         public static final String HOBBY = "취미";
