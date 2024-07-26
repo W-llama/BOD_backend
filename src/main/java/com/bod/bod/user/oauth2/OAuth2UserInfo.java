@@ -10,11 +10,18 @@ import lombok.Getter;
 public class OAuth2UserInfo {
 
 	private final String name;
+
 	private final String username;
+
 	private final String password;
+
 	private final String nickname;
+
 	private final String email;
+
 	private final String profileImage;
+
 	private final UserRole role;
+
 	private final UserStatus userStatus;
 }
