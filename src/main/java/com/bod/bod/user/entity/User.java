@@ -43,7 +43,7 @@ public class User extends TimeStamp {
     @Column(name = "introduce")
     private String introduce;
 
-    @Column(name = "image")
+    @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
     @Column(name = "point")

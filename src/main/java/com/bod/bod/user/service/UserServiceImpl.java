@@ -3,12 +3,14 @@ package com.bod.bod.user.service;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
+import com.bod.bod.global.service.S3ServiceImpl;
 import com.bod.bod.user.dto.*;
 import com.bod.bod.user.entity.*;
 import com.bod.bod.user.repository.*;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
+	private final S3ServiceImpl s3Service;
 
 	@Value("${JWT_SECRET_KEY}")
 	private String secretKey;
@@ -54,19 +58,18 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
 		String token = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, request);
-		if (token != null) {
-			Claims claims = jwtUtil.getUserInfoFromToken(token);
-			String tokenUsername = claims.getSubject();
-
-			if (!user.getUsername().equals(tokenUsername)) {
-				throw new GlobalException(ErrorCode.INVALID_TOKEN);
-			}
-
-			refreshTokenService.deleteByUserId(user.getId());
-			jwtUtil.clearAuthToken(response);
-		} else {
+		if (token == null) {
 			throw new GlobalException(ErrorCode.INVALID_TOKEN);
 		}
+		Claims claims = jwtUtil.getUserInfoFromToken(token);
+		String tokenUsername = claims.getSubject();
+
+		if (!user.getUsername().equals(tokenUsername)) {
+			throw new GlobalException(ErrorCode.INVALID_TOKEN);
+		}
+
+		refreshTokenService.deleteByUserId(user.getId());
+		jwtUtil.clearAuthToken(response);
 	}
 
 	@Override
@@ -91,6 +94,25 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDto editProfile(EditProfileRequestDto profileRequestDto, User user) {
 		validateActiveUserStatus(user);
 		updateProfile(profileRequestDto, user);
+		userRepository.save(user);
+		return new UserResponseDto(user);
+	}
+
+	@Override
+	@Transactional
+	public UserResponseDto editProfileImage(MultipartFile profileImage, User user) {
+		validateActiveUserStatus(user);
+		String existingImageUrl = user.getImage();
+		String newImageUrl;
+		try {
+			newImageUrl = s3Service.upload(profileImage);
+			if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
+				s3Service.deleteFromS3(existingImageUrl);
+			}
+		} catch (IOException e) {
+			throw new GlobalException(ErrorCode.FILE_UPLOAD_ERROR);
+		}
+		user.changeImage(newImageUrl);
 		userRepository.save(user);
 		return new UserResponseDto(user);
 	}
@@ -198,7 +220,6 @@ public class UserServiceImpl implements UserService {
 			user.changeNickname(profileRequestDto.getNickname());
 		}
 		user.changeIntroduce(profileRequestDto.getIntroduce());
-		user.changeImage(profileRequestDto.getImage());
 	}
 
 	private void validateNewPassword(String newPassword, User user) {
