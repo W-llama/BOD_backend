@@ -1,5 +1,9 @@
 package com.bod.bod.user.service;
 
+import com.bod.bod.challenge.dto.ChallengeResponseDto;
+import com.bod.bod.challenge.entity.Challenge;
+import com.bod.bod.challenge.entity.ConditionStatus;
+import com.bod.bod.userChallenge.UserChallenge;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
@@ -7,15 +11,23 @@ import com.bod.bod.global.service.S3Service;
 import com.bod.bod.user.dto.*;
 import com.bod.bod.user.entity.*;
 import com.bod.bod.user.repository.*;
+import com.bod.bod.userChallenge.UserChallengeRepository;
+import com.bod.bod.verification.repository.VerificationRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +39,12 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final UserPasswordHistoryRepository userPasswordHistoryRepository;
+	private final UserChallengeRepository userChallengeRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RefreshTokenService refreshTokenService;
 	private final S3Service s3Service;
+	private final VerificationRepository verificationRepository;
 
 	@Value("${JWT_SECRET_KEY}")
 	private String secretKey;
@@ -93,6 +107,29 @@ public class UserServiceImpl implements UserService {
 		User user = findById(userId);
 		validateActiveUserStatus(user);
 		return new UserResponseDto(user);
+	}
+
+	@Override
+	public Map<String, Slice<ChallengeResponseDto>> getMyChallenges(User user, Pageable pageable) {
+		validateActiveUserStatus(user);
+		Slice<UserChallenge> userChallengeSlice = userChallengeRepository.findByUser(user, pageable);
+
+		List<ChallengeResponseDto> ongoingChallenges = new ArrayList<>();
+		List<ChallengeResponseDto> completedChallenges = new ArrayList<>();
+
+		for (UserChallenge userChallenge : userChallengeSlice) {
+			Challenge challenge = userChallenge.getChallenge();
+			int verificationCount = verificationRepository.countByChallengeAndUser(challenge, user);
+			ChallengeResponseDto challengeResponseDto = new ChallengeResponseDto(challenge, verificationCount);
+			if (challenge.getConditionStatus() == ConditionStatus.COMPLETE) {
+				completedChallenges.add(challengeResponseDto);
+			} else {
+				ongoingChallenges.add(challengeResponseDto);
+			}
+		}
+
+		return getStringSliceMap(
+			pageable, ongoingChallenges, completedChallenges);
 	}
 
 	@Override
@@ -259,4 +296,19 @@ public class UserServiceImpl implements UserService {
 
 		userPasswordHistoryRepository.save(userPasswordHistory);
 	}
+
+	private static Map<String, Slice<ChallengeResponseDto>> getStringSliceMap(Pageable pageable,
+		List<ChallengeResponseDto> ongoingChallenges, List<ChallengeResponseDto> completedChallenges) {
+		boolean hasNextOngoing = ongoingChallenges.size() == pageable.getPageSize();
+		boolean hasNextCompleted = completedChallenges.size() == pageable.getPageSize();
+
+		Slice<ChallengeResponseDto> ongoingChallengesSlice = new SliceImpl<>(ongoingChallenges, pageable, hasNextOngoing);
+		Slice<ChallengeResponseDto> completedChallengesSlice = new SliceImpl<>(completedChallenges, pageable, hasNextCompleted);
+
+		Map<String, Slice<ChallengeResponseDto>> result = new HashMap<>();
+		result.put("ongoingChallenges", ongoingChallengesSlice);
+		result.put("completedChallenges", completedChallengesSlice);
+		return result;
+	}
+
 }
