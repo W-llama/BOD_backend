@@ -70,7 +70,20 @@ public class ChallengeController {
 		ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId,username);
 
 		return ResponseEntity.ok().body(new CommonResponseDto<>
-			(HttpStatus.OK.value(),"챌린지 등록 성공",challenge ));
+			(HttpStatus.OK.value(),"챌린지 등록 성공",challenge));
 	}
+
+	@GetMapping("/ challenges/{challengeId}/users")
+	public ResponseEntity<CommonResponseDto<ChallengeResponseDto>> getUserToChallenges(
+		@PathVariable("challengeId") Long challengeId,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	){
+		String username = userDetails.getUsername();
+		ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId, username);
+
+		return ResponseEntity.ok().body(new CommonResponseDto<>
+			(HttpStatus.OK.value(), "유저가 선택한 챌린지 조회 성공",challenge));
+	}
+
 
 }
