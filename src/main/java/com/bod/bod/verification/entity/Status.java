@@ -1,10 +1,13 @@
 package com.bod.bod.verification.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum Status {
 
-  APPROVE(VericationStatus.APPROVE),
-  REJECT(VericationStatus.REJECT),
-  PENDING(VericationStatus.PENDING);
+  APPROVE(VerificationStatus.APPROVE),
+  REJECT(VerificationStatus.REJECT),
+  PENDING(VerificationStatus.PENDING);
 
   private final String status;
 
@@ -12,11 +15,7 @@ public enum Status {
 	this.status = status;
   }
 
-  public String getStatus() {
-	return this.status;
-  }
-
-  public static class VericationStatus {
+	public static class VerificationStatus {
 	public static final String APPROVE = "APPROVE";
 	public static final String REJECT = "REJECT";
 	public static final String PENDING = "PENDING";

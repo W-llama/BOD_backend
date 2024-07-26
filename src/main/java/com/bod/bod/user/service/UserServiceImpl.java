@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
 	private final S3Service s3Service;
 	private final VerificationRepository verificationRepository;
 
-	@Value("${JWT_SECRET_KEY}")
+	@Value("${jwt.secret.key}")
 	private String secretKey;
 
 	@Value("${jwt.refresh-expire-time}")

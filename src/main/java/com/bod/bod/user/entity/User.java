@@ -1,20 +1,18 @@
 package com.bod.bod.user.entity;
 
 import com.bod.bod.global.TimeStamp;
+import com.bod.bod.userChallenge.UserChallenge;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.List;
+import lombok.*;
 
-@Table(name = "db_users")
+@Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Entity
+@Table(name = "db_users")
 public class User extends TimeStamp {
 
     @Id
@@ -54,6 +52,9 @@ public class User extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserChallenge> userChallenges;
+
     public void changeEmail(String email) {
         this.email = email;
     }
@@ -81,5 +82,4 @@ public class User extends TimeStamp {
     public void changePassword(String password) {
         this.password = password;
     }
-
 }
