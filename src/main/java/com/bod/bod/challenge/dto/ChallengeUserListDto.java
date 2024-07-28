@@ -12,7 +12,7 @@ public class ChallengeUserListDto {
     private String nickname;
     private String name;
 
-    public  ChallengeUserListDto(Challenge challenge, User user){
+    public ChallengeUserListDto (Challenge challenge, User user){
         this.id = challenge.getId();
         this.nickname = user.getNickname();
         this.name = user.getName();

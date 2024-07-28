@@ -36,12 +36,16 @@ public enum ErrorCode {
     ALREADY_EXISTS_APPROVE_VERIFICATION(409, "이미 챌린지 인증 요청을 승인하였습니다."),
     ALREADY_EXISTS_REJECT_VERIFICATION(409, "이미 챌린지 인증 요청을 거절하였습니다."),
 
+    // UserChallenge - related errors
+    NOT_FOUND_USER_CHALLENGE(404, "해당 유저의 챌린지 신청기록을 찾지 못했습니다."),
+
     // File-related errors
     FILE_UPLOAD_ERROR(500, "파일 크기가 너무 큽니다."),
     FILE_CONVERSION_ERROR(500, "파일 변환에 실패하였습니다."),
 
     // General error
-    FAIL(500, "실패하였습니다.");
+
+    FAIL(500, "실패하였습니다."),;
 
 
 

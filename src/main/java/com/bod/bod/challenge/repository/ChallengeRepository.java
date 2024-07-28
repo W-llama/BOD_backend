@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChallengeRepository extends JpaRepository<Challenge, Long>, ChallengeCustomRepository {
 
-  default Challenge findChallengeById(Long challengId) {
-	return findById(challengId).orElseThrow(
+  default Challenge findChallengeById(Long challengeId) {
+	return findById(challengeId).orElseThrow(
 		()-> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
   }
 }
