@@ -65,7 +65,7 @@ public class ChallengeService {
         return new ChallengeResponseDto(challenge);
     }
 
-    public List<ChallengeUserListDto> getChallengesByUser(Long challengeId, String username) {
+    public List<ChallengeUserListDto> getChallengesByUser(Long challengeId) {
 
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
         List<UserChallenge> userChallenges = userChallengeRepository.findByChallengeId(challenge.getId());
