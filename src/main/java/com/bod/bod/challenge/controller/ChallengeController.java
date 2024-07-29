@@ -72,11 +72,9 @@ public class ChallengeController {
 
 	@GetMapping("/{challengeId}/users")
 	public ResponseEntity<CommonResponseDto<List<ChallengeUserListDto>>> getUserByChallenges(
-		@PathVariable("challengeId") Long challengeId,
-		@AuthenticationPrincipal UserDetailsImpl userDetails
+		@PathVariable("challengeId") Long challengeId
 	) {
-		String username = userDetails.getUsername();
-		List<ChallengeUserListDto> userList = challengeService.getChallengesByUser(challengeId, username);
+		List<ChallengeUserListDto> userList = challengeService.getChallengesByUser(challengeId);
 
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "선택한 챌린지의 유저 조회 성공", userList));
