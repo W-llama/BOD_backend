@@ -5,13 +5,13 @@ import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
 import com.bod.bod.challenge.dto.ChallengeUserListDto;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
-import com.bod.bod.userchallenge.entity.UserChallenge;
 import com.bod.bod.challenge.repository.ChallengeRepository;
-import com.bod.bod.userchallenge.repository.UserChallengeRepository;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.UserRepository;
+import com.bod.bod.userchallenge.entity.UserChallenge;
+import com.bod.bod.userchallenge.repository.UserChallengeRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 public class ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-
     private final UserRepository userRepository;
     private final UserChallengeRepository userChallengeRepository;
 
@@ -43,12 +42,8 @@ public class ChallengeService {
     }
 
     public ChallengeResponseDto getChallengeDetails(Long challengeId) {
-        Challenge challenge = findChallengeById(challengeId);
+        Challenge challenge = findById(challengeId);
         return new ChallengeResponseDto(challenge);
-    }
-
-    public Challenge findChallengeById(Long challengeId) {
-        return challengeRepository.findChallengeById(challengeId);
     }
 
     public ChallengeResponseDto addUserToChallenge(Long challengeId, String username){
@@ -73,11 +68,21 @@ public class ChallengeService {
     public List<ChallengeUserListDto> getChallengesByUser(Long challengeId, String username) {
 
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
-
         List<UserChallenge> userChallenges = userChallengeRepository.findByChallengeId(challenge.getId());
 
         return userChallenges.stream()
             .map(userChallenge -> new ChallengeUserListDto(challenge, userChallenge.getUser()))
             .toList();
+    }
+
+    public void deleteChallenge(long challengeId, User user) {
+        UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, findById(challengeId))
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USER_CHALLENGE));
+
+        userChallengeRepository.delete(userChallenge);
+    }
+
+    public Challenge findById(Long challengeId) {
+        return challengeRepository.findChallengeById(challengeId);
     }
 }

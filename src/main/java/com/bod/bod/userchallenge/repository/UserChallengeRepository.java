@@ -16,4 +16,5 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     List<UserChallenge> findByChallengeId(Long challenge);
 
     Slice<UserChallenge> findByUser(User user, Pageable pageable);
+
 }

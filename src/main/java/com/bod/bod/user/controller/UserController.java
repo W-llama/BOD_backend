@@ -97,7 +97,7 @@ public class UserController {
 			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
 	}
 
-	@GetMapping("/users/challenges")
+	@GetMapping("/users/profile/challenges")
 	public ResponseEntity<CommonResponseDto<Map<String, Slice<ChallengeResponseDto>>>> getMyChallenges(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		@PageableDefault Pageable pageable

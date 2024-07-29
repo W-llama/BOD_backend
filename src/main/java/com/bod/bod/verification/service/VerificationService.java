@@ -42,7 +42,7 @@ public class VerificationService {
       metadata.setContentLength(image.getSize());
       amazonS3Client.putObject(BUCKET, image.getOriginalFilename(), image.getInputStream(), metadata);
 
-      Challenge challenge = challengeService.findChallengeById(challengeId);
+      Challenge challenge = challengeService.findById(challengeId);
 
       LocalDateTime currentDate = LocalDateTime.now();
       LocalDateTime startOfDay = currentDate.toLocalDate().atStartOfDay();
@@ -77,7 +77,7 @@ public class VerificationService {
 
   @Transactional(readOnly = true)
   public List<VerificationWithUserResponseDto> getVerificationsByChallengeId(int page, Long challengeId) {
-    Challenge challenge = challengeService.findChallengeById(challengeId);
+    Challenge challenge = challengeService.findById(challengeId);
     List<VerificationWithUserResponseDto> responseDto = verificationRepository.findVerificationWithUserByChallengeId(page, challengeId);
     if(responseDto.isEmpty()) {
       throw new GlobalException(ErrorCode.EMPTY_VERIFICATION);
