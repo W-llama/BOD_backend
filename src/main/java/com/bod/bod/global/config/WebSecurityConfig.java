@@ -7,6 +7,7 @@ import com.bod.bod.user.service.CustomOAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -15,6 +16,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -56,5 +60,28 @@ public class WebSecurityConfig {
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 
 		return http.build();
+	}
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+					.allowedOrigins("http://localhost:8081")
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+			}
+
+			@Override
+			public void addResourceHandlers(ResourceHandlerRegistry registry) {
+				registry.addResourceHandler("/**")
+					.addResourceLocations("classpath:/META-INF/resources/");
+				registry.addResourceHandler("index.html")
+					.addResourceLocations("classpath:/META-INF/resources/")
+					.setCacheControl(CacheControl.noStore()) // 브라우저 resource 저장 사용 x
+					.setCachePeriod(0); // 서버 캐시 사용하지 않음.
+			}
+		};
 	}
 }
