@@ -89,4 +89,11 @@ public class ChallengeController {
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "선택한 챌린지 삭제 성공", null));
 	}
+
+	@GetMapping("/top10")
+  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getTop10Challenges() {
+	  List<ChallengeSummaryResponseDto> getTop10ChallengeList = challengeService.getTop10Challenges();
+	  return ResponseEntity.ok().body(new CommonResponseDto<>(
+		  HttpStatus.OK.value(), "챌린지 top10 리스트 조회 성공", getTop10ChallengeList));
+	}
 }
