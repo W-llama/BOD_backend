@@ -62,4 +62,27 @@ public class WebSecurityConfig {
 		return http.build();
 	}
 
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**")
+					.allowedOrigins("http://localhost:8081")
+					.exposedHeaders("authorization") // 이 부분을 추가합니다.
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+			}
+
+			@Override
+			public void addResourceHandlers(ResourceHandlerRegistry registry) {
+				registry.addResourceHandler("/**")
+					.addResourceLocations("classpath:/META-INF/resources/");
+				registry.addResourceHandler("index.html")
+					.addResourceLocations("classpath:/META-INF/resources/")
+					.setCacheControl(CacheControl.noStore()) // 브라우저 resource 저장 사용 x
+					.setCachePeriod(0); // 서버 캐시 사용하지 않음.
+			}
+		};
+	}
 }

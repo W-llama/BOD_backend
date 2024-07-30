@@ -4,6 +4,7 @@ import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengesResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
@@ -11,6 +12,7 @@ import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
 import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.admin.service.AdminService;
+import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.verification.entity.Verification;
@@ -135,5 +137,21 @@ public class AdminController {
         adminService.rejectVerification(verificationId);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청을 거절하였습니다!", null));
+    }
+
+    @GetMapping("/admins/challenges")
+    public ResponseEntity<CommonResponseDto<List<AdminChallengesResponseDto>>> getAllChallenges(
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
+        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
+    ) {
+        Page<Challenge> responseDto = adminService.getAllChallenges(page - 1, size, sortBy, isAsc);
+
+        List<AdminChallengesResponseDto> challengeList = responseDto.stream()
+            .map(AdminChallengesResponseDto::new)
+            .toList();
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "전체 챌린지 조회에 성공하였습니다!", challengeList));
     }
 }
