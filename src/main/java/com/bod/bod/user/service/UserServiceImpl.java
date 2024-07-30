@@ -16,13 +16,6 @@ import com.bod.bod.verification.repository.VerificationRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +24,12 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -128,8 +126,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		return getStringSliceMap(
-			pageable, ongoingChallenges, completedChallenges);
+		return getStringSliceMap(pageable, ongoingChallenges, completedChallenges);
 	}
 
 	@Override
@@ -176,8 +173,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User findById(long userId) {
-		return userRepository.findById(userId).
-			orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 	}
 
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
@@ -202,7 +199,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private UserRole determineUserRole(SignUpRequestDto signUpRequestDto) {
-		if ("ADMIN".equalsIgnoreCase(signUpRequestDto.getRole())) {
+		if (StringUtils.hasText(signUpRequestDto.getAdminToken())) {
 			validateAdminToken(signUpRequestDto.getAdminToken());
 			return UserRole.ADMIN;
 		}
@@ -210,7 +207,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void validateAdminToken(String adminToken) {
-		if (adminToken == null || !adminToken.equals(secretKey)) {
+		if (!adminToken.equals(secretKey)) {
 			throw new GlobalException(ErrorCode.INVALID_ADMIN_TOKEN);
 		}
 	}
@@ -223,8 +220,6 @@ public class UserServiceImpl implements UserService {
 			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
 			.name(signUpRequestDto.getName())
 			.nickname(signUpRequestDto.getNickname())
-			.introduce(signUpRequestDto.getIntroduce())
-			.image(signUpRequestDto.getImage())
 			.userStatus(UserStatus.ACTIVE)
 			.userRole(userRole)
 			.build();
@@ -310,5 +305,4 @@ public class UserServiceImpl implements UserService {
 		result.put("completedChallenges", completedChallengesSlice);
 		return result;
 	}
-
 }

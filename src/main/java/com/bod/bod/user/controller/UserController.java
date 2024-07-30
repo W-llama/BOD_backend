@@ -97,16 +97,6 @@ public class UserController {
 			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
 	}
 
-	@GetMapping("/users/profile/challenges")
-	public ResponseEntity<CommonResponseDto<Map<String, Slice<ChallengeResponseDto>>>> getMyChallenges(
-		@AuthenticationPrincipal UserDetailsImpl userDetails,
-		@PageableDefault Pageable pageable
-	) {
-		Map<String, Slice<ChallengeResponseDto>> challengeSlices = userService.getMyChallenges(userDetails.getUser(), pageable);
-		return ResponseEntity.ok().body(new CommonResponseDto<>(
-			HttpStatus.OK.value(), "참여한 챌린지 목록 조회가 완료되었습니다.", challengeSlices));
-	}
-
 	@PutMapping("/users/profile")
 	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfile(
 		@RequestBody @Valid EditProfileRequestDto editProfileRequestDto,
@@ -135,5 +125,15 @@ public class UserController {
 		UserResponseDto userResponseDto = userService.editProfileImage(profileImage, userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "프로필 이미지 수정이 완료되었습니다.", userResponseDto));
+	}
+
+	@GetMapping("/users/profile/challenges")
+	public ResponseEntity<CommonResponseDto<Map<String, Slice<ChallengeResponseDto>>>> getMyChallenges(
+		@AuthenticationPrincipal UserDetailsImpl userDetails,
+		@PageableDefault Pageable pageable
+	) {
+		Map<String, Slice<ChallengeResponseDto>> challengeSlices = userService.getMyChallenges(userDetails.getUser(), pageable);
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "참여한 챌린지 목록 조회가 완료되었습니다.", challengeSlices));
 	}
 }
