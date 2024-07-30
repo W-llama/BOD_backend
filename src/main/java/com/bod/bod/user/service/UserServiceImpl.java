@@ -16,13 +16,6 @@ import com.bod.bod.verification.repository.VerificationRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -129,8 +126,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		return getStringSliceMap(
-			pageable, ongoingChallenges, completedChallenges);
+		return getStringSliceMap(pageable, ongoingChallenges, completedChallenges);
 	}
 
 	@Override
@@ -177,8 +173,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User findById(long userId) {
-		return userRepository.findById(userId).
-			orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 	}
 
 	private void checkExistingUserOrEmail(SignUpRequestDto signUpRequestDto) {
@@ -309,5 +305,4 @@ public class UserServiceImpl implements UserService {
 		result.put("completedChallenges", completedChallengesSlice);
 		return result;
 	}
-
 }
