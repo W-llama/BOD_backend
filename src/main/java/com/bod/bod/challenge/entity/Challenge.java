@@ -43,6 +43,9 @@ public class Challenge extends TimeStamp {
     @Column(name = "image", nullable = false)
     private String image;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String imageUrl;
+
     @Column(name = "category", nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;

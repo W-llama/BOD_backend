@@ -31,7 +31,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api")
@@ -76,10 +78,11 @@ public class AdminController {
             (HttpStatus.OK.value(), "회원 상태 수정에 성공하였습니다!", adminUserStatusUpdateResponseDto));
     }
 
-    @PostMapping("/admins/challenges")
+    @PostMapping(value = "/admins/challenges")
     public ResponseEntity<CommonResponseDto<AdminChallengeCreateResponseDto>> createChallenge(
-        @Valid @RequestBody AdminChallengeCreateRequestDto reqDto) {
-        AdminChallengeCreateResponseDto resDto = adminService.createChallenge(reqDto);
+        @RequestPart(value="image") MultipartFile image,
+        @RequestPart("request")AdminChallengeCreateRequestDto reqDto) {
+        AdminChallengeCreateResponseDto resDto = adminService.createChallenge(image, reqDto);
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 등록에 성공하였습니다!", resDto));
     }

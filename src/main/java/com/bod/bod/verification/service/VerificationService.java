@@ -29,10 +29,10 @@ public class VerificationService {
 
   private final VerificationRepository verificationRepository;
   private final ChallengeService challengeService;
+  private final AmazonS3Client amazonS3Client;
 
   @Value("${cloud.aws.s3.bucket}")
   private String BUCKET;
-  private final AmazonS3Client amazonS3Client;
 
   @Transactional
   public VerificationResponseDto requestVerification(Long challengeId, MultipartFile image, VerificationRequestDto requestDto, User user) {
@@ -40,7 +40,7 @@ public class VerificationService {
       ObjectMetadata metadata= new ObjectMetadata();
       metadata.setContentType(image.getContentType());
       metadata.setContentLength(image.getSize());
-      amazonS3Client.putObject(BUCKET, image.getOriginalFilename(), image.getInputStream(), metadata);
+      amazonS3Client.putObject(BUCKET, "verification/" + image.getOriginalFilename(), image.getInputStream(), metadata);
 
       Challenge challenge = challengeService.findById(challengeId);
 
@@ -54,7 +54,7 @@ public class VerificationService {
         throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
       }
 
-      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, image.getOriginalFilename());
+      String imageUrl= amazonS3Client.getResourceUrl(BUCKET, "verification/" + image.getOriginalFilename());
       Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
       verificationRepository.save(verification);
 
@@ -70,7 +70,7 @@ public class VerificationService {
   public void cancelVerification(Long verificationId, User user) {
     Verification verification = findVerificationById(verificationId);
     verification.checkUser(user);
-    DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, verification.getImageName());
+    DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, "verification/" + verification.getImageName());
     amazonS3Client.deleteObject(request);
     verificationRepository.delete(verification);
   }
