@@ -8,5 +8,6 @@ public interface ChallengeCustomRepository {
 
   List<ChallengeSummaryResponseDto> getChallengeListByCategory(int page, Category category);
   List<ChallengeSummaryResponseDto> getChallengeList(int page);
+  List<ChallengeSummaryResponseDto> findTop10ChallengesByUserchallenges();
 
 }

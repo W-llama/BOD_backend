@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class ChallengeService {
     private final UserRepository userRepository;
     private final UserChallengeRepository userChallengeRepository;
 
+    @Transactional(readOnly = true)
     public List<ChallengeSummaryResponseDto> getChallengesByCategory(int page, Category category) {
         List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeListByCategory(page, category);
         if (challengeList.isEmpty()) {
@@ -33,6 +35,7 @@ public class ChallengeService {
         return challengeList;
     }
 
+    @Transactional(readOnly = true)
     public List<ChallengeSummaryResponseDto> getAllChallenges(int page) {
         List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeList(page);
         if (challengeList.isEmpty()) {
@@ -41,11 +44,13 @@ public class ChallengeService {
         return challengeList;
     }
 
+    @Transactional(readOnly = true)
     public ChallengeResponseDto getChallengeDetails(Long challengeId) {
         Challenge challenge = findById(challengeId);
         return new ChallengeResponseDto(challenge);
     }
 
+    @Transactional
     public ChallengeResponseDto addUserToChallenge(Long challengeId, String username){
 
         User user = userRepository.findByUsername(username)
@@ -65,6 +70,7 @@ public class ChallengeService {
         return new ChallengeResponseDto(challenge);
     }
 
+    @Transactional(readOnly = true)
     public List<ChallengeUserListDto> getChallengesByUser(Long challengeId) {
 
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
@@ -75,6 +81,7 @@ public class ChallengeService {
             .toList();
     }
 
+    @Transactional
     public void deleteChallenge(long challengeId, User user) {
         UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, findById(challengeId))
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USER_CHALLENGE));
@@ -82,7 +89,17 @@ public class ChallengeService {
         userChallengeRepository.delete(userChallenge);
     }
 
+    @Transactional(readOnly = true)
+    public List<ChallengeSummaryResponseDto> getTop10Challenges() {
+        List<ChallengeSummaryResponseDto> top10ChallengeList = challengeRepository.findTop10ChallengesByUserchallenges();
+        if (top10ChallengeList.isEmpty()) {
+            throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
+        }
+        return top10ChallengeList;
+    }
+
     public Challenge findById(Long challengeId) {
         return challengeRepository.findChallengeById(challengeId);
     }
+
 }
