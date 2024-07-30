@@ -70,6 +70,7 @@ public class WebSecurityConfig {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
 					.allowedOrigins("http://localhost:8081")
+					.exposedHeaders("authorization") // 이 부분을 추가합니다.
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 			}
 

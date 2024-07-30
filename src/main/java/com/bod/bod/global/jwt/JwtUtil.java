@@ -85,7 +85,6 @@ public class JwtUtil {
 		refreshTokenCookie.setHttpOnly(true);
 		refreshTokenCookie.setPath("/");
 		refreshTokenCookie.setMaxAge((int) refreshTokenExpireTime);
-
 		response.addCookie(refreshTokenCookie);
 	}
 
