@@ -31,6 +31,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private UserRole determineUserRole(SignUpRequestDto signUpRequestDto) {
-		if ("ADMIN".equalsIgnoreCase(signUpRequestDto.getRole())) {
+		if (StringUtils.hasText(signUpRequestDto.getAdminToken())) {
 			validateAdminToken(signUpRequestDto.getAdminToken());
 			return UserRole.ADMIN;
 		}
@@ -210,7 +211,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private void validateAdminToken(String adminToken) {
-		if (adminToken == null || !adminToken.equals(secretKey)) {
+		if (!adminToken.equals(secretKey)) {
 			throw new GlobalException(ErrorCode.INVALID_ADMIN_TOKEN);
 		}
 	}
@@ -223,8 +224,6 @@ public class UserServiceImpl implements UserService {
 			.password(passwordEncoder.encode(signUpRequestDto.getPassword()))
 			.name(signUpRequestDto.getName())
 			.nickname(signUpRequestDto.getNickname())
-			.introduce(signUpRequestDto.getIntroduce())
-			.image(signUpRequestDto.getImage())
 			.userStatus(UserStatus.ACTIVE)
 			.userRole(userRole)
 			.build();

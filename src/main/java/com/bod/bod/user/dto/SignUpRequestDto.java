@@ -42,13 +42,6 @@ public class SignUpRequestDto {
 	)
 	private String nickname;
 
-	@Size(max = 255, message = "Introduce must be less than 255 characters")
-	private String introduce;
-
-	private String image;
-
-	private final String role = "";
-
-	private final String adminToken = "";
+	private String adminToken;
 
 }
