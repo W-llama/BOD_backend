@@ -1,5 +1,7 @@
 package com.bod.bod.global.jwt;
 
+import com.bod.bod.global.exception.ErrorCode;
+import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.service.RefreshTokenService;
@@ -13,7 +15,6 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
@@ -23,6 +24,8 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -81,11 +84,15 @@ public class JwtUtil {
 	}
 
 	public void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-		Cookie refreshTokenCookie = new Cookie(REFRESH_HEADER, refreshToken);
-		refreshTokenCookie.setHttpOnly(true);
-		refreshTokenCookie.setPath("/");
-		refreshTokenCookie.setMaxAge((int) refreshTokenExpireTime);
-		response.addCookie(refreshTokenCookie);
+		ResponseCookie cookie = ResponseCookie.from(REFRESH_HEADER, refreshToken)
+			.path("/")
+			.sameSite("None")
+			.httpOnly(true)
+			.secure(false)
+			.maxAge((int) refreshTokenExpireTime)
+			.build();
+
+		response.addHeader("Set-Cookie", cookie.toString());
 	}
 
 	public void clearAuthToken(HttpServletResponse response) {
@@ -129,4 +136,15 @@ public class JwtUtil {
 	public Claims getUserInfoFromToken(String token) {
 		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 	}
+
+	public String refreshAccessToken(String refreshToken) {
+		if (validateToken(refreshToken)) {
+			Claims claims = getUserInfoFromToken(refreshToken);
+			String username = claims.getSubject();
+			UserRole userRole = UserRole.valueOf(claims.get(AUTHORIZATION_KEY, String.class));
+			return createAccessToken(username, userRole);
+		}
+		throw new GlobalException(ErrorCode.INVALID_REFRESH_TOKEN);
+	}
+
 }

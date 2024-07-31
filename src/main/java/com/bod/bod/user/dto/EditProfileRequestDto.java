@@ -18,6 +18,4 @@ public class EditProfileRequestDto {
 
 	@Size(max = 255, message = "Introduce must be less than 255 characters")
 	private String introduce;
-
-	private String image;
 }

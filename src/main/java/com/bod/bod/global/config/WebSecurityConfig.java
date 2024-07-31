@@ -55,6 +55,7 @@ public class WebSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/signup/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/challenges/**").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/refresh-token").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/admins/**").hasRole("ADMIN")
 				.anyRequest().authenticated())
 			.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)))  // OAuth2 로그인 설정
@@ -72,6 +73,7 @@ public class WebSecurityConfig {
 				registry.addMapping("/**")
 					.allowedOrigins("http://localhost:8081")
 					.exposedHeaders("authorization") // 이 부분을 추가합니다.
+					.allowCredentials(true) // 쿠키 인증 요청 허용
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 			}
 
