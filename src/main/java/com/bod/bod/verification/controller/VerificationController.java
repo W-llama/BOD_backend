@@ -4,6 +4,7 @@ import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.verification.dto.VerificationRequestDto;
 import com.bod.bod.verification.dto.VerificationResponseDto;
+import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
 import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.service.VerificationService;
 import java.util.List;
@@ -58,6 +59,15 @@ public class VerificationController {
 	List<VerificationWithUserResponseDto> verificationList = verificationService.getVerificationsByChallengeId(page, challengeId);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 인증신청 목록 조회 성공", verificationList));
+  }
+
+  @GetMapping("/challenges/{challengeId}/verifications/top3users")
+  public ResponseEntity<CommonResponseDto<List<VerificationTop3UserResponseDto>>> getTop3VerificationUsers(
+	  @PathVariable("challengeId") Long challengeId
+  ) {
+	List<VerificationTop3UserResponseDto> verificationUserList = verificationService.getTop3VerificationUsers(challengeId);
+	return ResponseEntity.ok().body(new CommonResponseDto<>
+		(HttpStatus.OK.value(), "챌린지 인증 상위 참여자 조회 성공", verificationUserList));
   }
 }
 
