@@ -27,7 +27,7 @@ public class ChallengeResponseDto {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.content = challenge.getContent();
-        this.image = challenge.getImage();
+        this.image = challenge.getImageUrl();
         this.category = challenge.getCategory();
         this.conditionStatus = challenge.getConditionStatus();
         this.startTime = challenge.getStartTime();
