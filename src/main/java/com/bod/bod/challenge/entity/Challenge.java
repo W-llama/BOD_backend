@@ -66,10 +66,9 @@ public class Challenge extends TimeStamp {
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChallenge> userChallenges = new ArrayList<>();
 
-    public void changeChallenge (String title, String content, String image, Category category, ConditionStatus conditionStatus, LocalDateTime startTime, LocalDateTime endTime) {
+    public void changeChallenge (String title, String content, Category category, ConditionStatus conditionStatus, LocalDateTime startTime, LocalDateTime endTime) {
         this.title = title;
         this.content = content;
-        this.image = image;
         this.category = category;
         this.conditionStatus = conditionStatus;
         this.startTime = startTime;

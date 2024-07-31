@@ -17,8 +17,6 @@ public class AdminChallengeUpdateResponseDto {
 
     private String content;
 
-    private String image;
-
     private Category category;
 
     private ConditionStatus conditionStatus;
@@ -35,7 +33,6 @@ public class AdminChallengeUpdateResponseDto {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
         this.content = challenge.getContent();
-        this.image = challenge.getImage();
         this.category = challenge.getCategory();
         this.conditionStatus = challenge.getConditionStatus();
         this.startTime = challenge.getStartTime();
