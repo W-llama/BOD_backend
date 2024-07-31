@@ -11,6 +11,7 @@ import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.verification.dto.VerificationRequestDto;
 import com.bod.bod.verification.dto.VerificationResponseDto;
+import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
 import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
@@ -79,6 +80,16 @@ public class VerificationService {
   public List<VerificationWithUserResponseDto> getVerificationsByChallengeId(int page, Long challengeId) {
     Challenge challenge = challengeService.findById(challengeId);
     List<VerificationWithUserResponseDto> responseDto = verificationRepository.findVerificationWithUserByChallengeId(page, challengeId);
+    if(responseDto.isEmpty()) {
+      throw new GlobalException(ErrorCode.EMPTY_VERIFICATION);
+    }
+    return responseDto;
+  }
+
+  @Transactional(readOnly = true)
+  public List<VerificationTop3UserResponseDto> getTop3VerificationUsers(Long challengeId) {
+    Challenge challenge = challengeService.findById(challengeId);
+    List<VerificationTop3UserResponseDto> responseDto = verificationRepository.getTop3VerificationUsers(challengeId);
     if(responseDto.isEmpty()) {
       throw new GlobalException(ErrorCode.EMPTY_VERIFICATION);
     }
