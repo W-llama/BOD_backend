@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,10 +29,10 @@ public class VerificationController {
   private final VerificationService verificationService;
 
   @PostMapping(value = "/challenges/{challengeId}/verifications")
-  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> uploadImage(
+  public ResponseEntity<CommonResponseDto<VerificationResponseDto>> requestVerification(
 	  @PathVariable("challengeId") Long challengeId,
-	  @RequestParam(value="image") MultipartFile image,
-	  VerificationRequestDto requestDto,
+	  @RequestPart(value="image") MultipartFile image,
+	  @RequestPart("request") VerificationRequestDto requestDto,
 	  @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
 	VerificationResponseDto verification = verificationService.requestVerification(challengeId, image, requestDto, userDetails.getUser());
