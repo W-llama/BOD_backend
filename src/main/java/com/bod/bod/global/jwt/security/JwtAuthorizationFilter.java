@@ -32,26 +32,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-		String tokenValue = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, req);
+		String accessToken = jwtUtil.getTokenFromHeader(JwtUtil.AUTHORIZATION_HEADER, req);
 
-		if (StringUtils.hasText(tokenValue)) {
+		if (StringUtils.hasText(accessToken)) {
 			try {
-				if (!jwtUtil.validateToken(tokenValue)) {
-					log.error("Token Error");
-					SecurityContextHolder.clearContext();
-					return;
-				}
-				Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+				Claims info = jwtUtil.getUserInfoFromToken(accessToken);
 				setAuthentication(info.getSubject());
-
 			} catch (ExpiredJwtException e) {
-				res.setStatus(HttpStatus.UNAUTHORIZED.value());
-				res.setContentType("application/json");
-				res.setCharacterEncoding("UTF-8");
-				res.getWriter().write("{\"message\":\"리프레시 토큰으로 재발급 받으세요\"}");
+				handleExpiredAccessToken(req, res);
 				return;
 			} catch (Exception e) {
-				log.error(e.getMessage());
+				log.error("Token Error: " + e.getMessage());
 				SecurityContextHolder.clearContext();
 				return;
 			}
@@ -59,8 +50,24 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(req, res);
 	}
 
+	private void handleExpiredAccessToken(HttpServletRequest req, HttpServletResponse res) throws IOException {
+		String refreshToken = jwtUtil.getTokenFromHeader(JwtUtil.REFRESH_HEADER, req);
+
+		if (StringUtils.hasText(refreshToken) && jwtUtil.validateToken(refreshToken)) {
+			String newAccessToken = jwtUtil.refreshAccessToken(refreshToken);
+			jwtUtil.addJwtToHeader(JwtUtil.AUTHORIZATION_HEADER, JwtUtil.BEARER_PREFIX + newAccessToken, res);
+			Claims info = jwtUtil.getUserInfoFromToken(newAccessToken);
+			setAuthentication(info.getSubject());
+		} else {
+			res.setStatus(HttpStatus.UNAUTHORIZED.value());
+			res.setContentType("application/json");
+			res.setCharacterEncoding("UTF-8");
+			res.getWriter().write("{\"message\":\"리프레시 토큰으로 재발급 받으세요\"}");
+		}
+	}
+
 	// 인증 처리
-	public void setAuthentication(String username) {
+	private void setAuthentication(String username) {
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		Authentication authentication = createAuthentication(username);
 		context.setAuthentication(authentication);
