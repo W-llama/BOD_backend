@@ -2,8 +2,11 @@ package com.bod.bod.global.config;
 
 import com.bod.bod.global.jwt.JwtUtil;
 import com.bod.bod.global.jwt.security.JwtAuthorizationFilter;
+import com.bod.bod.global.jwt.security.OAuth2.CustomOAuth2FailureHandler;
+import com.bod.bod.global.jwt.security.OAuth2.CustomOAuth2SuccessHandler;
 import com.bod.bod.global.jwt.security.UserDetailServiceImpl;
 import com.bod.bod.user.service.CustomOAuth2UserServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +31,8 @@ public class WebSecurityConfig {
 	private final UserDetailServiceImpl userDetailsService;
 	private final JwtUtil jwtUtil;
 	private final CustomOAuth2UserServiceImpl customOAuth2UserService;
+	private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+	private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
 
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -58,7 +63,18 @@ public class WebSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/refresh-token").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/admins/**").hasRole("ADMIN")
 				.anyRequest().authenticated())
-			.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)))  // OAuth2 로그인 설정
+
+			.logout(logout -> logout
+				.logoutUrl("/api/logout")
+				.logoutSuccessHandler((request, response, authentication) -> {
+					response.setStatus(HttpServletResponse.SC_OK);
+				}))
+
+			.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService))
+				.successHandler(customOAuth2SuccessHandler)
+				.failureHandler(customOAuth2FailureHandler))
+
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 
 		return http.build();
@@ -74,7 +90,7 @@ public class WebSecurityConfig {
 					.allowedOrigins("http://localhost:8081")
 					.exposedHeaders("authorization") // 이 부분을 추가합니다.
 					.allowCredentials(true) // 쿠키 인증 요청 허용
-					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH" ,"OPTIONS");
 			}
 
 			@Override
