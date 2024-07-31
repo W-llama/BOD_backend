@@ -1,21 +1,29 @@
 package com.bod.bod.admin.dto;
 
+import com.bod.bod.verification.entity.Status;
 import com.bod.bod.verification.entity.Verification;
+import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
 public class AdminVerificationGetResponse {
 
+    private Long verificationId;
+
+    private LocalDateTime createdAt;
+
     private String image;
 
     private String title;
 
-    private String content;
+    private Status status;
 
     public AdminVerificationGetResponse(Verification verification) {
+        this.verificationId = verification.getId();
+        this.createdAt = verification.getCreatedAt();
         this.image = verification.getImageUrl();
         this.title = verification.getTitle();
-        this.content = verification.getContent();
+        this.status = verification.getStatus();
     }
 
 }

@@ -2,6 +2,7 @@ package com.bod.bod.admin.controller;
 
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengeResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengesResponseDto;
@@ -110,7 +111,7 @@ public class AdminController {
     public ResponseEntity<CommonResponseDto<List<AdminVerificationGetResponse>>> getVerifications(
         @PathVariable(name = "challengeId") Long challengeId,
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
         @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
     ) {
@@ -156,5 +157,14 @@ public class AdminController {
             .toList();
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "전체 챌린지 조회에 성공하였습니다!", challengeList));
+    }
+
+    @GetMapping("/admins/challenges/{challengeId}")
+    public ResponseEntity<CommonResponseDto<AdminChallengeResponseDto>> getChallenge(
+        @PathVariable(name = "challengeId") Long challengeId
+    ) {
+        AdminChallengeResponseDto responseDto = adminService.getChallenge(challengeId);
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 조회에 성공하였습니다!", responseDto));
     }
 }
