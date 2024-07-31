@@ -10,6 +10,8 @@ public class AdminVerificationGetResponse {
 
     private Long verificationId;
 
+    private String user;
+
     private LocalDateTime createdAt;
 
     private String image;
@@ -20,6 +22,7 @@ public class AdminVerificationGetResponse {
 
     public AdminVerificationGetResponse(Verification verification) {
         this.verificationId = verification.getId();
+        this.user = verification.getUser().getUsername();
         this.createdAt = verification.getCreatedAt();
         this.image = verification.getImageUrl();
         this.title = verification.getTitle();
