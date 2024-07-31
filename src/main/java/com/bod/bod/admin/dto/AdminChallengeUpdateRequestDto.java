@@ -14,8 +14,6 @@ public class AdminChallengeUpdateRequestDto {
 
     private String content;
 
-    private String image;
-
     private Category category;
 
     private ConditionStatus conditionStatus;

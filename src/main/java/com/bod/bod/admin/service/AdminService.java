@@ -104,7 +104,7 @@ public class AdminService {
 	Challenge challenge = challengeRepository.findById(challengeId)
 		.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-	challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getImage(), reqDto.getCategory(),
+	challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getCategory(),
 		reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
 
 	return new AdminChallengeUpdateResponseDto(challenge);
