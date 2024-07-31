@@ -145,7 +145,7 @@ public class AdminController {
     @GetMapping("/admins/challenges")
     public ResponseEntity<CommonResponseDto<List<AdminChallengesResponseDto>>> getAllChallenges(
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
         @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
     ) {
