@@ -15,6 +15,7 @@ import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.admin.service.AdminService;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.dto.CommonResponseDto;
+import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.verification.entity.Verification;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -48,9 +50,10 @@ public class AdminController {
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
+        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<User> responseDto = adminService.getAllUsers(page - 1, size, sortBy, isAsc);
+        Page<User> responseDto = adminService.getAllUsers(page - 1, size, sortBy, isAsc, userDetails.getUser());
 
         List<AdminUsersResponseDto> usersList = responseDto.stream()
             .map(AdminUsersResponseDto::new)
@@ -62,9 +65,10 @@ public class AdminController {
     @PutMapping("/admins/users/{userId}")
     public ResponseEntity<CommonResponseDto<AdminUserUpdateResponseDto>> updateUser(
         @PathVariable(name = "userId") Long userId,
-        @Valid @RequestBody AdminUserUpdateRequestDto requestDto
+        @Valid @RequestBody AdminUserUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        AdminUserUpdateResponseDto adminUserUpdateResponseDto = adminService.updateUser(userId, requestDto);
+        AdminUserUpdateResponseDto adminUserUpdateResponseDto = adminService.updateUser(userId, requestDto, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "회원 정보 수정에 성공하였습니다!", adminUserUpdateResponseDto));
     }
@@ -72,9 +76,10 @@ public class AdminController {
     @PutMapping("/admins/users/{userId}/status")
     public ResponseEntity<CommonResponseDto<AdminUserStatusUpdateResponseDto>> updateUserStatus(
         @PathVariable(name = "userId") Long userId,
-        @Valid @RequestBody AdminUserStatusUpdateRequestDto requestDto
+        @Valid @RequestBody AdminUserStatusUpdateRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        AdminUserStatusUpdateResponseDto adminUserStatusUpdateResponseDto = adminService.updateUserStatus(userId, requestDto);
+        AdminUserStatusUpdateResponseDto adminUserStatusUpdateResponseDto = adminService.updateUserStatus(userId, requestDto, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "회원 상태 수정에 성공하였습니다!", adminUserStatusUpdateResponseDto));
     }
@@ -82,8 +87,10 @@ public class AdminController {
     @PostMapping(value = "/admins/challenges")
     public ResponseEntity<CommonResponseDto<AdminChallengeCreateResponseDto>> createChallenge(
         @RequestPart(value="image") MultipartFile image,
-        @RequestPart("request")AdminChallengeCreateRequestDto reqDto) {
-        AdminChallengeCreateResponseDto resDto = adminService.createChallenge(image, reqDto);
+        @RequestPart("request")AdminChallengeCreateRequestDto reqDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        AdminChallengeCreateResponseDto resDto = adminService.createChallenge(image, reqDto, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 등록에 성공하였습니다!", resDto));
     }
@@ -91,18 +98,20 @@ public class AdminController {
     @PatchMapping("/admins/challenges/{challengeId}")
     public ResponseEntity<CommonResponseDto<AdminChallengeUpdateResponseDto>> updateChallenge(
         @PathVariable(name = "challengeId") Long challengeId,
-        @Valid @RequestBody AdminChallengeUpdateRequestDto reqDto
+        @Valid @RequestBody AdminChallengeUpdateRequestDto reqDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto);
+        AdminChallengeUpdateResponseDto resDto = adminService.updateChallenge(challengeId, reqDto, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 수정에 성공하였습니다!", resDto));
     }
 
     @DeleteMapping("/admins/challenges/{challengeId}")
     public ResponseEntity<CommonResponseDto<Void>> deleteChallenge(
-        @PathVariable(name = "challengeId") Long challengeId
+        @PathVariable(name = "challengeId") Long challengeId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        adminService.deleteChallenge(challengeId);
+        adminService.deleteChallenge(challengeId, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 삭제에 성공하였습니다!", null));
     }
@@ -113,9 +122,10 @@ public class AdminController {
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
+        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<Verification> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc);
+        Page<Verification> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc, userDetails.getUser());
 
         List<AdminVerificationGetResponse> verifications = responseDto.stream()
             .map(AdminVerificationGetResponse::new)
@@ -127,18 +137,20 @@ public class AdminController {
 
     @PutMapping("/admins/verifications/{verificationId}/approve")
     public ResponseEntity<CommonResponseDto<Void>> approveVerification(
-        @PathVariable(name = "verificationId") Long verificationId
+        @PathVariable(name = "verificationId") Long verificationId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        adminService.approveVerification(verificationId);
+        adminService.approveVerification(verificationId, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청을 승인하였습니다!", null));
     }
 
     @PutMapping("/admins/verifications/{verificationId}/reject")
     public ResponseEntity<CommonResponseDto<Void>> rejectVerification(
-        @PathVariable(name = "verificationId") Long verificationId
+        @PathVariable(name = "verificationId") Long verificationId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        adminService.rejectVerification(verificationId);
+        adminService.rejectVerification(verificationId, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청을 거절하였습니다!", null));
     }
@@ -148,9 +160,10 @@ public class AdminController {
         @RequestParam(value = "page", defaultValue = "1") int page,
         @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
+        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<Challenge> responseDto = adminService.getAllChallenges(page - 1, size, sortBy, isAsc);
+        Page<Challenge> responseDto = adminService.getAllChallenges(page - 1, size, sortBy, isAsc, userDetails.getUser());
 
         List<AdminChallengesResponseDto> challengeList = responseDto.stream()
             .map(AdminChallengesResponseDto::new)
@@ -161,9 +174,10 @@ public class AdminController {
 
     @GetMapping("/admins/challenges/{challengeId}")
     public ResponseEntity<CommonResponseDto<AdminChallengeResponseDto>> getChallenge(
-        @PathVariable(name = "challengeId") Long challengeId
+        @PathVariable(name = "challengeId") Long challengeId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        AdminChallengeResponseDto responseDto = adminService.getChallenge(challengeId);
+        AdminChallengeResponseDto responseDto = adminService.getChallenge(challengeId, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 조회에 성공하였습니다!", responseDto));
     }
