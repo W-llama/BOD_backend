@@ -16,7 +16,9 @@ import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,22 +47,23 @@ public class VerificationService {
 
       Challenge challenge = challengeService.findById(challengeId);
 
-      LocalDateTime currentDate = LocalDateTime.now();
-      LocalDateTime startOfDay = currentDate.toLocalDate().atStartOfDay();
-      LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+      LocalDateTime currentDateTime = LocalDateTime.now();
+      LocalDate currentDate = currentDateTime.toLocalDate();
+      LocalDateTime startOfDay = currentDate.atStartOfDay();
+      LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
 
-      List<Verification> existingVerificationList = verificationRepository.findByCreatedAtBetweenAndUser(startOfDay, endOfDay, user);
+      boolean checkVerification = verificationRepository.existsByChallengeIdAndUserAndCreatedAtBetween(
+          challengeId, user, startOfDay, endOfDay
+      );
 
-      if(!existingVerificationList.isEmpty()) {
-        throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
+      if (checkVerification) {
+       throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
       }
 
       String imageUrl= amazonS3Client.getResourceUrl(BUCKET, "verification/" + image.getOriginalFilename());
       Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
       verificationRepository.save(verification);
-
-      VerificationResponseDto responseDto = new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
-      return responseDto;
+      return new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
 
     } catch(IOException e) {
       throw new FileUploadFailureException("파일 업로드 실패");
