@@ -59,7 +59,7 @@ public class AdminService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
-        user.changeName(requestDto.getName());
+        user.changePoint(requestDto.getPoint());
 
         return new AdminUserUpdateResponseDto(user);
     }
