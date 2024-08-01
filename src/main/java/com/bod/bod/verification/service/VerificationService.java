@@ -109,7 +109,7 @@ public class VerificationService {
     Pageable pageable = PageRequest.of(page, size);
     Page<VerificationWithChallengeResponseDto> verificationListByUser = verificationRepository.getVerificationsByUser(pageable, user);
     if(verificationListByUser.isEmpty()) {
-      throw new GlobalException(ErrorCode.EMPTY_VERIFICATION);
+      throw new GlobalException(ErrorCode.NOT_FOUND_USER_VERIFICATION);
     }
 
     return new PaginationResponse<>(
