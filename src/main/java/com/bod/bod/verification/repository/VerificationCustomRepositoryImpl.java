@@ -19,7 +19,7 @@ public class VerificationCustomRepositoryImpl implements VerificationCustomRepos
 
   private final JPAQueryFactory queryFactory;
 
-  private int PAGE_SIZE = 5;
+  private int PAGE_SIZE = 6;
 
   public List<VerificationWithUserResponseDto> findVerificationWithUserByChallengeId(int page, Long challengeId) {
 	QVerification verification = QVerification.verification;
