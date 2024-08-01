@@ -34,7 +34,7 @@ public class ChallengeController {
   ) {
 	//로그인 한 유저정보
 	String username = userDetails.getUsername();
-	ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId, username);
+	ChallengeResponseDto challenge = challengeService.addUserToChallenge(challengeId, userDetails.getUser());
 
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 등록 성공", challenge));
