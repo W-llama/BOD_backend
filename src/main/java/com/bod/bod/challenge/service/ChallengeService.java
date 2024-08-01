@@ -3,8 +3,10 @@ package com.bod.bod.challenge.service;
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
 import com.bod.bod.challenge.dto.ChallengeUserListDto;
+import com.bod.bod.challenge.dto.PaginationResponse;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
+import com.bod.bod.challenge.entity.ConditionStatus;
 import com.bod.bod.challenge.repository.ChallengeRepository;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
@@ -15,6 +17,10 @@ import com.bod.bod.userchallenge.repository.UserChallengeRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,21 +33,43 @@ public class ChallengeService {
     private final UserChallengeRepository userChallengeRepository;
 
     @Transactional(readOnly = true)
-    public List<ChallengeSummaryResponseDto> getChallengesByCategory(int page, Category category) {
-        List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeListByCategory(page, category);
-        if (challengeList.isEmpty()) {
+    public PaginationResponse<ChallengeSummaryResponseDto> getChallengesByCategory(int page, int size, Category category) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<Challenge> challenges = challengeRepository.findByCategory(category, pageable);
+        if (challenges.isEmpty()) {
             throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
         }
-        return challengeList;
+        List<ChallengeSummaryResponseDto> challengeList = challenges.getContent().stream()
+            .map(ChallengeSummaryResponseDto::new)
+            .toList();
+
+        return new PaginationResponse<>(
+            challengeList,
+            challenges.getTotalPages(),
+            challenges.getTotalElements(),
+            challenges.getNumber(),
+            challenges.getSize()
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<ChallengeSummaryResponseDto> getAllChallenges(int page) {
-        List<ChallengeSummaryResponseDto> challengeList = challengeRepository.getChallengeList(page);
-        if (challengeList.isEmpty()) {
+    public PaginationResponse<ChallengeSummaryResponseDto> getAllChallenges(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Challenge> challenges = challengeRepository.findAll(pageable);
+        if (challenges.isEmpty()) {
             throw new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE);
         }
-        return challengeList;
+        List<ChallengeSummaryResponseDto> challengeList = challenges.getContent().stream()
+            .map(ChallengeSummaryResponseDto::new)
+            .toList();
+
+        return new PaginationResponse<>(
+            challengeList,
+            challenges.getTotalPages(),
+            challenges.getTotalPages(),
+            challenges.getNumber(),
+            challenges.getSize()
+        );
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +81,9 @@ public class ChallengeService {
     @Transactional
     public ChallengeResponseDto addUserToChallenge(Long challengeId, User user){
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
-
+        if (challenge.getConditionStatus().equals(ConditionStatus.COMPLETE)) {
+            throw new GlobalException(ErrorCode.COMPLETE_CHALLENGE);
+        }
         Optional<UserChallenge> existingUserChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge);
         if(existingUserChallenge.isPresent()){
             throw new GlobalException(ErrorCode.DUPLICATE_CHALLENGE);
