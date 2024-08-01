@@ -94,4 +94,8 @@ public class User extends TimeStamp {
         this.point -= 500L;
     }
 
+    public void changePoint(Long point) {
+        this.point = point;
+    }
+
 }

@@ -46,7 +46,7 @@ public class AdminController {
     @GetMapping("/admins/users")
     public ResponseEntity<CommonResponseDto<List<AdminUsersResponseDto>>> getAllUsers(
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "size", defaultValue = "100") int size,
         @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
         @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc
     ) {

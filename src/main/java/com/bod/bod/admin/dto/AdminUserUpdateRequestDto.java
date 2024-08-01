@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AdminUserUpdateRequestDto {
 
-    private String name;
+    private Long point;
 
 }

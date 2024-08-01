@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class AdminUserUpdateResponseDto {
 
-    private String name;
+    private Long point;
 
     public AdminUserUpdateResponseDto(User user) {
-        this.name = user.getName();
+        this.point = user.getPoint();
     }
 
 }
