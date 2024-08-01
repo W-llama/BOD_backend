@@ -51,11 +51,7 @@ public class ChallengeService {
     }
 
     @Transactional
-    public ChallengeResponseDto addUserToChallenge(Long challengeId, String username){
-
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(()-> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
-
+    public ChallengeResponseDto addUserToChallenge(Long challengeId, User user){
         Challenge challenge = challengeRepository.findChallengeById(challengeId);
 
         Optional<UserChallenge> existingUserChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge);

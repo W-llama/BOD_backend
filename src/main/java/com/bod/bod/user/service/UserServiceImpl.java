@@ -112,6 +112,7 @@ public class UserServiceImpl implements UserService {
 		validateActiveUserStatus(user);
 		Slice<UserChallenge> userChallengeSlice = userChallengeRepository.findByUser(user, pageable);
 
+		List<ChallengeResponseDto> beforeChallenges = new ArrayList<>();
 		List<ChallengeResponseDto> ongoingChallenges = new ArrayList<>();
 		List<ChallengeResponseDto> completedChallenges = new ArrayList<>();
 
@@ -121,12 +122,13 @@ public class UserServiceImpl implements UserService {
 			ChallengeResponseDto challengeResponseDto = new ChallengeResponseDto(challenge, verificationCount);
 			if (challenge.getConditionStatus() == ConditionStatus.COMPLETE) {
 				completedChallenges.add(challengeResponseDto);
-			} else {
+			} else if (challenge.getConditionStatus() == ConditionStatus.TODO) {
 				ongoingChallenges.add(challengeResponseDto);
-			}
+			} else if (challenge.getConditionStatus() == ConditionStatus.BEFORE) {
+				beforeChallenges.add(challengeResponseDto);
+		  	}
 		}
-
-		return getStringSliceMap(pageable, ongoingChallenges, completedChallenges);
+		return getStringSliceMap(pageable, ongoingChallenges, completedChallenges, beforeChallenges);
 	}
 
 	@Override
@@ -293,16 +295,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	private static Map<String, Slice<ChallengeResponseDto>> getStringSliceMap(Pageable pageable,
-		List<ChallengeResponseDto> ongoingChallenges, List<ChallengeResponseDto> completedChallenges) {
+		List<ChallengeResponseDto> ongoingChallenges, List<ChallengeResponseDto> completedChallenges, List<ChallengeResponseDto> beforeChallenges) {
 		boolean hasNextOngoing = ongoingChallenges.size() == pageable.getPageSize();
 		boolean hasNextCompleted = completedChallenges.size() == pageable.getPageSize();
+		boolean hasNextBefore = beforeChallenges.size() == pageable.getPageSize();
 
 		Slice<ChallengeResponseDto> ongoingChallengesSlice = new SliceImpl<>(ongoingChallenges, pageable, hasNextOngoing);
 		Slice<ChallengeResponseDto> completedChallengesSlice = new SliceImpl<>(completedChallenges, pageable, hasNextCompleted);
+	  	Slice<ChallengeResponseDto> beforeChallengesSlice = new SliceImpl<>(beforeChallenges, pageable, hasNextBefore);
 
 		Map<String, Slice<ChallengeResponseDto>> result = new HashMap<>();
 		result.put("ongoingChallenges", ongoingChallengesSlice);
 		result.put("completedChallenges", completedChallengesSlice);
+		result.put("beforeChallenges", beforeChallengesSlice);
 		return result;
 	}
 }
