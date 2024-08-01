@@ -1,10 +1,12 @@
 package com.bod.bod.verification.controller;
 
+import com.bod.bod.challenge.dto.PaginationResponse;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.verification.dto.VerificationRequestDto;
 import com.bod.bod.verification.dto.VerificationResponseDto;
 import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
+import com.bod.bod.verification.dto.VerificationWithChallengeResponseDto;
 import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.service.VerificationService;
 import java.util.List;
@@ -32,7 +34,7 @@ public class VerificationController {
   @PostMapping(value = "/challenges/{challengeId}/verifications")
   public ResponseEntity<CommonResponseDto<VerificationResponseDto>> requestVerification(
 	  @PathVariable("challengeId") Long challengeId,
-	  @RequestPart(value="image") MultipartFile image,
+	  @RequestPart(value = "image") MultipartFile image,
 	  @RequestPart("request") VerificationRequestDto requestDto,
 	  @AuthenticationPrincipal UserDetailsImpl userDetails
   ) {
@@ -69,6 +71,19 @@ public class VerificationController {
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 인증 상위 참여자 조회 성공", verificationUserList));
   }
+
+  @GetMapping("/challenges/verificaitons/users")
+  public ResponseEntity<CommonResponseDto<PaginationResponse<VerificationWithChallengeResponseDto>>> getVerficationsByUser(
+	  @RequestParam(value = "page", defaultValue = "0") int page,
+	  @RequestParam(value = "size", defaultValue = "9") int size,
+	  @AuthenticationPrincipal UserDetailsImpl userDetails
+  ) {
+	PaginationResponse<VerificationWithChallengeResponseDto> verificationsByUSerList = verificationService.getVerficationsByUser(page, size,
+		userDetails.getUser());
+	return ResponseEntity.ok().body(new CommonResponseDto<>
+		(HttpStatus.OK.value(), "챌린지 인증상태 목록 조회 성공", verificationsByUSerList));
+  }
+
 }
 
 
