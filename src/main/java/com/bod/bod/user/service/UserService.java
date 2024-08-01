@@ -45,4 +45,5 @@ public interface UserService {
 	UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user);
 
 	User findById(long userId);
+
 }
