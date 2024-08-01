@@ -3,6 +3,7 @@ package com.bod.bod.challenge.controller;
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
 import com.bod.bod.challenge.dto.ChallengeUserListDto;
+import com.bod.bod.challenge.dto.PaginationResponse;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.service.ChallengeService;
 import com.bod.bod.global.dto.CommonResponseDto;
@@ -41,22 +42,24 @@ public class ChallengeController {
   }
 
   @GetMapping("/category")
-  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getChallengeListByCategory(
-	  @RequestParam(value = "page", defaultValue = "1") int page,
+  public ResponseEntity<CommonResponseDto<PaginationResponse<ChallengeSummaryResponseDto>>> getChallengeListByCategory(
+	  @RequestParam(value = "page", defaultValue = "0") int page,
+	  @RequestParam(value = "size", defaultValue = "9") int size,
 	  @RequestParam Category category
   ) {
-	List<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(
-		page - 1, category);
+	PaginationResponse<ChallengeSummaryResponseDto> challengeList = challengeService.getChallengesByCategory(
+		page, size, category);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "카테고리별 챌린지 조회 성공", challengeList));
   }
 
   @GetMapping
-  public ResponseEntity<CommonResponseDto<List<ChallengeSummaryResponseDto>>> getAllChallenge(
-	  @RequestParam(value = "page", defaultValue = "1") int page
+  public ResponseEntity<CommonResponseDto<PaginationResponse<ChallengeSummaryResponseDto>>> getAllChallenge(
+	  @RequestParam(value = "page", defaultValue = "0") int page,
+	  @RequestParam(value = "size", defaultValue = "9") int size
   ) {
-	List<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(
-		page - 1);
+	PaginationResponse<ChallengeSummaryResponseDto> challengeList = challengeService.getAllChallenges(
+		page, size);
 	return ResponseEntity.ok().body(new CommonResponseDto<>
 		(HttpStatus.OK.value(), "챌린지 전체 조회 성공", challengeList));
   }

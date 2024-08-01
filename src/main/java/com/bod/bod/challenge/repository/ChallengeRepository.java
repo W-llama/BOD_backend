@@ -1,5 +1,6 @@
 package com.bod.bod.challenge.repository;
 
+import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
@@ -15,5 +16,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
     }
 
     Page<Challenge> findAll(Pageable pageable);
-
+    Page<Challenge> findByCategory(Category category, Pageable pageable);
 }
