@@ -20,6 +20,7 @@ import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.FileUploadFailureException;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
+import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
@@ -46,16 +47,24 @@ public class AdminService {
     @Value("${cloud.aws.s3.bucket}")
     private String BUCKET;
 
-    public Page<User> getAllUsers(int page, int size, String sortBy, boolean isAsc) {
+    public Page<User> getAllUsers(int page, int size, String sortBy, boolean isAsc, User user) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
 
         return userRepository.findAll(pageable);
     }
 
     @Transactional
-    public AdminUserUpdateResponseDto updateUser(long userId, AdminUserUpdateRequestDto requestDto) {
+    public AdminUserUpdateResponseDto updateUser(long userId, AdminUserUpdateRequestDto requestDto, User userDetails) {
+        if (!userDetails.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
+
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
@@ -65,7 +74,11 @@ public class AdminService {
     }
 
     @Transactional
-    public AdminUserStatusUpdateResponseDto updateUserStatus(long userId, AdminUserStatusUpdateRequestDto requestDto) {
+    public AdminUserStatusUpdateResponseDto updateUserStatus(long userId, AdminUserStatusUpdateRequestDto requestDto, User userDetails) {
+        if (!userDetails.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
+
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
 
@@ -74,7 +87,10 @@ public class AdminService {
         return new AdminUserStatusUpdateResponseDto(user);
     }
 
-    public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto) {
+    public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(image.getContentType());
@@ -101,7 +117,10 @@ public class AdminService {
     }
 
     @Transactional
-    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto) {
+    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
@@ -112,7 +131,10 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteChallenge(long challengeId) {
+    public void deleteChallenge(long challengeId, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
         DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, "challenge/" + challenge.getImage());
@@ -120,7 +142,10 @@ public class AdminService {
         challengeRepository.delete(challenge);
     }
 
-    public Page<Verification> getVerifications(long challengeId, int page, int size, String sortBy, boolean isAsc) {
+    public Page<Verification> getVerifications(long challengeId, int page, int size, String sortBy, boolean isAsc, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
@@ -132,7 +157,10 @@ public class AdminService {
     }
 
     @Transactional
-    public void approveVerification(long verificationId) {
+    public void approveVerification(long verificationId, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Verification verification = verificationRepository.findVerificationById(verificationId);
         if (verification.getStatus().getStatus().equals("APPROVE")) {
             throw new GlobalException(ErrorCode.ALREADY_EXISTS_APPROVE_VERIFICATION);
@@ -143,7 +171,10 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectVerification(long verificationId) {
+    public void rejectVerification(long verificationId, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Verification verification = verificationRepository.findVerificationById(verificationId);
         if (verification.getStatus().getStatus().equals("REJECT")) {
             throw new GlobalException(ErrorCode.ALREADY_EXISTS_REJECT_VERIFICATION);
@@ -157,7 +188,10 @@ public class AdminService {
         }
     }
 
-    public Page<Challenge> getAllChallenges(int page, int size, String sortBy, boolean isAsc) {
+    public Page<Challenge> getAllChallenges(int page, int size, String sortBy, boolean isAsc, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -165,7 +199,10 @@ public class AdminService {
         return challengeRepository.findAll(pageable);
     }
 
-    public AdminChallengeResponseDto getChallenge(long challengeId) {
+    public AdminChallengeResponseDto getChallenge(long challengeId, User user) {
+        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 

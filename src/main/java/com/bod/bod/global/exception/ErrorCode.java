@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
     INVALID_REFRESH_TOKEN(401, "유효하지 않은 리프레시 토큰입니다."),
     EXPIRED_REFRESH_TOKEN(403, "토큰이 만료되었습니다."),
+    USER_ACCESS_DENIED(403, "관리자만 접근 가능합니다."),
 
     // User-related errors
     ALREADY_NICKNAME(409, "해당 닉네임은 이미 사용 중입니다."),
