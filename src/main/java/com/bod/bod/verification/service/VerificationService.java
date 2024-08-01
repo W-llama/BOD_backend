@@ -3,6 +3,7 @@ package com.bod.bod.verification.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.bod.bod.challenge.dto.PaginationResponse;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.service.ChallengeService;
 import com.bod.bod.global.exception.ErrorCode;
@@ -12,6 +13,7 @@ import com.bod.bod.user.entity.User;
 import com.bod.bod.verification.dto.VerificationRequestDto;
 import com.bod.bod.verification.dto.VerificationResponseDto;
 import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
+import com.bod.bod.verification.dto.VerificationWithChallengeResponseDto;
 import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
@@ -22,6 +24,9 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +102,23 @@ public class VerificationService {
       throw new GlobalException(ErrorCode.EMPTY_VERIFICATION);
     }
     return responseDto;
+  }
+
+  @Transactional(readOnly = true)
+  public PaginationResponse<VerificationWithChallengeResponseDto> getVerficationsByUser(int page, int size, User user) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<VerificationWithChallengeResponseDto> verificationListByUser = verificationRepository.getVerificationsByUser(pageable, user);
+    if(verificationListByUser.isEmpty()) {
+      throw new GlobalException(ErrorCode.NOT_FOUND_USER_VERIFICATION);
+    }
+
+    return new PaginationResponse<>(
+        verificationListByUser.getContent(),
+        verificationListByUser.getTotalPages(),
+        verificationListByUser.getTotalElements(),
+        verificationListByUser.getNumber(),
+        verificationListByUser.getSize()
+    );
   }
 
   public Verification findVerificationById(Long verificationId) {
