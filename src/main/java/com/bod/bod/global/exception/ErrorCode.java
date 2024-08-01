@@ -38,7 +38,7 @@ public enum ErrorCode {
     NOT_FOUND_VERIFICATION(404, "해당 챌린지 인증은 존재하지 않습니다."),
     ALREADY_EXISTS_APPROVE_VERIFICATION(409, "이미 챌린지 인증 요청을 승인하였습니다."),
     ALREADY_EXISTS_REJECT_VERIFICATION(409, "이미 챌린지 인증 요청을 거절하였습니다."),
-    NOT_FOUND_USER_VERIFICATION(409, "유저의 인증신청 내역이 없습니다."),
+    NOT_FOUND_USER_VERIFICATION(404, "유저의 인증신청 내역이 없습니다."),
 
     // UserChallenge-related errors
     NOT_FOUND_USER_CHALLENGE(404, "해당 유저의 챌린지 신청기록을 찾지 못했습니다."),
