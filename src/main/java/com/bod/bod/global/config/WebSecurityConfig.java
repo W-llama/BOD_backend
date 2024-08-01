@@ -61,7 +61,6 @@ public class WebSecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/users/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/challenges/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/refresh-token").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/admins/**").hasRole("ADMIN")
 				.anyRequest().authenticated())
 
 			.logout(logout -> logout

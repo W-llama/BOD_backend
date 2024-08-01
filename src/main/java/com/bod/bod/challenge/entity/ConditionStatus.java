@@ -1,5 +1,8 @@
 package com.bod.bod.challenge.entity;
 
+import lombok.Getter;
+
+@Getter
 public enum ConditionStatus {
 
     BEFORE(ConditionType.BEFORE),
@@ -12,9 +15,7 @@ public enum ConditionStatus {
         this.conditionStatus = conditionStatus;
     }
 
-    public String getConditionStatus() {return this.conditionStatus;}
-
-    public static class ConditionType{
+	public static class ConditionType{
         public static final String BEFORE = "대기";
         public static final String TODO = "진행중";
         public static final String COMPLETE = "마감";
