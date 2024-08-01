@@ -20,7 +20,12 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
 
     Page<Verification> findAllByChallengeId(long challengeId, Pageable pageable);
 
-    List<Verification> findByCreatedAtBetweenAndUser(LocalDateTime startDateTime, LocalDateTime endDateTime, User user);
+    boolean existsByChallengeIdAndUserAndCreatedAtBetween(
+        Long challengeId,
+        User user,
+        LocalDateTime startOfDay,
+        LocalDateTime endOfDay
+    );
 
     int countByChallengeAndUser(Challenge challenge, User user);
 }
