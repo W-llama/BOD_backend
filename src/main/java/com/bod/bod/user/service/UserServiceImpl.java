@@ -2,7 +2,6 @@ package com.bod.bod.user.service;
 
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.entity.Challenge;
-import com.bod.bod.challenge.entity.ConditionStatus;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
@@ -86,8 +85,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response) {
-		validateWithdrawalRequest(loginRequestDto, user);
+	public void withdraw(String username, String password, User user, HttpServletResponse response) {
+		validateWithdrawalRequest(username, password, user);
 		user.changeUserStatus(UserStatus.WITHDRAW);
 		refreshTokenService.deleteByUserId(user.getId());
 		jwtUtil.clearAuthToken(response);
@@ -181,6 +180,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public void validateUsernameRequest(String username, User user) {
+		if (!user.getUsername().equals(username)) {
+			throw new GlobalException(ErrorCode.INVALID_USERNAME);
+		}
+	}
+
+	@Override
 	public User findById(long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USERNAME));
@@ -259,12 +265,10 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	private void validateWithdrawalRequest(LoginRequestDto loginRequestDto, User user) {
-		if (!user.getUsername().equals(loginRequestDto.getUsername())) {
-			throw new GlobalException(ErrorCode.INVALID_USERNAME);
-		}
+	private void validateWithdrawalRequest(String username, String password,User user) {
+		validateUsernameRequest(username, user);
 		validateActiveUserStatus(user);
-		validateUserPassword(loginRequestDto.getPassword(), user.getPassword());
+		validateUserPassword(password, user.getPassword());
 	}
 
 	private void updateProfile(EditProfileRequestDto profileRequestDto, User user) {
