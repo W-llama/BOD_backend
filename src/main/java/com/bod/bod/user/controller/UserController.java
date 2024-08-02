@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -70,13 +71,24 @@ public class UserController {
 
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<CommonResponseDto<Void>> withdraw(
-		@RequestBody @Valid LoginRequestDto loginRequestDto,
+		@RequestParam String username,
+		@RequestParam String password,
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
 		HttpServletResponse response
 	) {
-		userService.withdraw(loginRequestDto, userDetails.getUser(), response);
+		userService.withdraw(username, password, userDetails.getUser(), response);
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "회원탈퇴가 완료되었습니다.", null));
+	}
+
+	@PostMapping("/checkUserName")
+	public ResponseEntity<CommonResponseDto<Void>> validateUsernameRequest(
+		@RequestParam String username,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		userService.validateUsernameRequest(username, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "아이디가 일치합니다", null));
 	}
 
 	@GetMapping("/users/{userId}")
