@@ -27,7 +27,7 @@ public interface UserService {
 	void logout(HttpServletRequest request, HttpServletResponse response, User user);
 
 	@Transactional
-	void withdraw(LoginRequestDto loginRequestDto, User user, HttpServletResponse response);
+	void withdraw(String username, String password, User user, HttpServletResponse response);
 
 	UserResponseDto getMyProfile(User user);
 
@@ -43,6 +43,8 @@ public interface UserService {
 
 	@Transactional
 	UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user);
+
+	void validateUsernameRequest(String username, User user);
 
 	User findById(long userId);
 
