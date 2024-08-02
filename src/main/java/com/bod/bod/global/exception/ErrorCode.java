@@ -22,7 +22,7 @@ public enum ErrorCode {
     NOT_FOUND_USERNAME(404, "해당 아이디는 존재하지 않습니다."),
     DUPLICATE_NICKNAME(409, "해당 닉네임은 이미 사용 중입니다."),
     DUPLICATE_EMAIL(409, "중복된 이메일입니다."),
-    INVALID_PASSWORD(401, "비밀번호가 일치하지 않습니다."),
+    INVALID_PASSWORD(404, "비밀번호가 일치하지 않습니다."),
     INVALID_USER_STATUS(403, "회원 탈퇴한 유저입니다."),
     INVALID_USERNAME(404, "아이디가 일치하지 않습니다."),
     INVALID_NEW_PASSWORD(400, "최근 3개의 비밀번호와 일치함으로 변경할 수 없습니다."),

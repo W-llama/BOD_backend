@@ -180,6 +180,16 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public void validateNewPassword(String newPassword, User user) {
+		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
+		for (UserPasswordHistory passwordHistory : passwordHistories) {
+			if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {
+				throw new GlobalException(ErrorCode.INVALID_NEW_PASSWORD);
+			}
+		}
+	}
+
+	@Override
 	public void validateUsernameRequest(String username, User user) {
 		if (!user.getUsername().equals(username)) {
 			throw new GlobalException(ErrorCode.INVALID_USERNAME);
@@ -279,14 +289,7 @@ public class UserServiceImpl implements UserService {
 		user.changeIntroduce(profileRequestDto.getIntroduce());
 	}
 
-	private void validateNewPassword(String newPassword, User user) {
-		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
-		for (UserPasswordHistory passwordHistory : passwordHistories) {
-			if (passwordEncoder.matches(newPassword, passwordHistory.getPassword())) {
-				throw new GlobalException(ErrorCode.INVALID_NEW_PASSWORD);
-			}
-		}
-	}
+
 
 	private void savePasswordHistory(User user, String password) {
 		List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
