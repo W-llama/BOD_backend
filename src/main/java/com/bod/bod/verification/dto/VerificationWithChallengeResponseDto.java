@@ -10,18 +10,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VerificationWithChallengeResponseDto {
 
-	private Long verificationId;
-	private String challengeTitle;
-	private Status status;
-	private String verificationImageUrl;
-	private LocalDateTime createdAt;
+  private Long verificationId;
+  private String challengeTitle;
+  private Status status;
+  private String verificationImageUrl;
+  private LocalDateTime createdAt;
 
-	public VerificationWithChallengeResponseDto(Long verificationId, String challengeTitle, Status status, String verificationImageUrl, LocalDateTime createdAt) {
-		this.verificationId = verificationId;
-		this.challengeTitle = challengeTitle;
-		this.status = status;
-		this.verificationImageUrl = verificationImageUrl;
-		this.createdAt = createdAt;
-	}
+  public VerificationWithChallengeResponseDto(Long verificationId, String challengeTitle, Status status, String verificationImageUrl, LocalDateTime createdAt) {
+	this.verificationId = verificationId;
+	this.challengeTitle = challengeTitle;
+	this.status = status;
+	this.verificationImageUrl = verificationImageUrl;
+	this.createdAt = createdAt;
+  }
 
 }
