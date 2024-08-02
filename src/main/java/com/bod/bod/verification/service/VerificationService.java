@@ -15,6 +15,7 @@ import com.bod.bod.verification.dto.VerificationResponseDto;
 import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
 import com.bod.bod.verification.dto.VerificationWithChallengeResponseDto;
 import com.bod.bod.verification.dto.VerificationWithUserResponseDto;
+import com.bod.bod.verification.entity.Status;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.io.IOException;
@@ -78,6 +79,9 @@ public class VerificationService {
   @Transactional
   public void cancelVerification(Long verificationId, User user) {
     Verification verification = findVerificationById(verificationId);
+    if(verification.getStatus().equals(Status.APPROVE)) {
+      throw new GlobalException(ErrorCode.DO_NOT_CANCEL_VERIFICATION);
+    }
     verification.checkUser(user);
     DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, "verification/" + verification.getImageName());
     amazonS3Client.deleteObject(request);

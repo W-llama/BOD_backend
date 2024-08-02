@@ -66,6 +66,7 @@ public class VerificationCustomRepositoryImpl implements VerificationCustomRepos
 			verification.id,
 			challenge.title,
 			verification.status,
+			verification.imageUrl,
 			verification.createdAt))
 		.from(verification)
 		.leftJoin(challenge)

@@ -72,8 +72,8 @@ public class VerificationController {
 		(HttpStatus.OK.value(), "챌린지 인증 상위 참여자 조회 성공", verificationUserList));
   }
 
-  @GetMapping("/challenges/verificaitons/users")
-  public ResponseEntity<CommonResponseDto<PaginationResponse<VerificationWithChallengeResponseDto>>> getVerficationsByUser(
+  @GetMapping("/verifications/users")
+  public ResponseEntity<CommonResponseDto<PaginationResponse<VerificationWithChallengeResponseDto>>> getVerificationsByUser(
 	  @RequestParam(value = "page", defaultValue = "0") int page,
 	  @RequestParam(value = "size", defaultValue = "9") int size,
 	  @AuthenticationPrincipal UserDetailsImpl userDetails
