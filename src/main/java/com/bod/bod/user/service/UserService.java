@@ -44,6 +44,8 @@ public interface UserService {
 	@Transactional
 	UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user);
 
+	void validateNewPassword(String newPassword, User user);
+
 	void validateUsernameRequest(String username, User user);
 
 	User findById(long userId);

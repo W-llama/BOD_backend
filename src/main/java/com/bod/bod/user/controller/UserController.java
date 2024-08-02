@@ -129,6 +129,16 @@ public class UserController {
 			HttpStatus.OK.value(), "비밀번호 수정이 완료되었습니다.", userResponseDto));
 	}
 
+	@PostMapping("/users/validateNewPassword")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> validateNewPassword(
+		@RequestBody String newPassword,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		userService.validateNewPassword(newPassword, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "최근 사용한 3개의 비밀번호와 일치하지않습니다.", null));
+	}
+
 	@PutMapping("/users/profile/image")
 	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfileImage(
 		@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
