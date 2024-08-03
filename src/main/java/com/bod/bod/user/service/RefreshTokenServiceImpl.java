@@ -1,5 +1,7 @@
 package com.bod.bod.user.service;
 
+import com.bod.bod.global.exception.ErrorCode;
+import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.RefreshToken;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.repository.RefreshTokenRepository;
@@ -17,27 +19,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 	@Override
 	@Transactional
-	public RefreshToken createOrUpdateRefreshToken(User user, String token, LocalDateTime expirationAt) {
-		Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserId(user.getId());
-		if (existingToken.isPresent()) {
-			RefreshToken refreshToken = existingToken.get();
-			refreshToken.updateToken(token);
-			refreshToken.updateExpirationAt(expirationAt);
-			return refreshTokenRepository.save(refreshToken);
-		} else {
-			RefreshToken refreshToken = RefreshToken.builder()
+	public void createOrUpdateRefreshToken(User user, String refreshToken, LocalDateTime expirationAt) {
+		refreshTokenRepository.findByUserId(user.getId())
+			.map(existingToken -> {
+				existingToken.updateToken(refreshToken);
+				existingToken.updateExpirationAt(expirationAt);
+				return refreshTokenRepository.save(existingToken);
+			})
+			.orElseGet(() -> refreshTokenRepository.save(RefreshToken.builder()
 				.userId(user.getId())
-				.token(token)
+				.refreshToken(refreshToken)
 				.expirationAt(expirationAt)
-				.build();
-			return refreshTokenRepository.save(refreshToken);
-		}
-	}
-
-	@Override
-	@Transactional
-	public void deleteByToken(String token) {
-		refreshTokenRepository.deleteByToken(token);
+				.build()));
 	}
 
 	@Override
@@ -45,14 +38,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 	public void deleteByUserId(Long userId) {
 		refreshTokenRepository.deleteByUserId(userId);
 	}
-
-	@Override
-	public Optional<RefreshToken> findByToken(String token) {
-		return refreshTokenRepository.findByToken(token);
-	}
-
-	@Override
-	public Optional<RefreshToken> findByUserId(Long userId) {
-		return refreshTokenRepository.findByUserId(userId);
-	}
 }
+
+

@@ -9,13 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 public interface RefreshTokenService {
 
 	@Transactional
-	RefreshToken createOrUpdateRefreshToken(User user, String token, LocalDateTime expirationAt);
-
-	void deleteByToken(String token);
+	void createOrUpdateRefreshToken(User user, String token, LocalDateTime expirationAt);
 
 	void deleteByUserId(Long userId);
 
-	Optional<RefreshToken> findByToken(String token);
-
-	Optional<RefreshToken> findByUserId(Long userId);
 }
