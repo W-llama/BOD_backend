@@ -22,7 +22,7 @@ public class RefreshToken extends TimeStamp {
 	private Long id;
 
 	@Column(nullable = false)
-	private String token;
+	private String refreshToken;
 
 	@Column(nullable = false)
 	private LocalDateTime expirationAt;
@@ -30,8 +30,8 @@ public class RefreshToken extends TimeStamp {
 	@Column(name = "userId", nullable = false)
 	private Long userId;
 
-	public void updateToken(String token) {
-		this.token = token;
+	public void updateToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 
 	public void updateExpirationAt(LocalDateTime expirationAt) {
