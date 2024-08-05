@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,8 @@ public class AdminService {
     private final VerificationRepository verificationRepository;
 
     private final AmazonS3Client amazonS3Client;
+    private final RedisTemplate<String, String> redisTemplate;
+
     @Value("${cloud.aws.s3.bucket}")
     private String BUCKET;
 
@@ -166,7 +169,9 @@ public class AdminService {
             throw new GlobalException(ErrorCode.ALREADY_EXISTS_APPROVE_VERIFICATION);
         } else {
             verification.changeStatusApprove();
-            verification.getUser().increasePoint();
+            User verifiedUser = verification.getUser();
+            verifiedUser.increasePoint();
+            redisTemplate.opsForZSet().add("ranking", verifiedUser.getNickname(), verifiedUser.getPoint());
         }
     }
 

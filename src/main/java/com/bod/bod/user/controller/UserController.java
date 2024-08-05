@@ -6,12 +6,14 @@ import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
 import com.bod.bod.user.dto.EditProfileRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
+import com.bod.bod.user.dto.PointRankingResponseDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -158,4 +160,13 @@ public class UserController {
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
 			HttpStatus.OK.value(), "참여한 챌린지 목록 조회가 완료되었습니다.", challengeSlices));
 	}
+
+	@GetMapping("/users/ranking/points")
+  	public ResponseEntity<CommonResponseDto<List<PointRankingResponseDto>>> getRankingList(
+	) {
+	  List<PointRankingResponseDto> rankingList = userService.getRankingList();
+	  return ResponseEntity.ok().body(new CommonResponseDto<>(
+		  HttpStatus.OK.value(), "포인트 랭킹 조회 성공", rankingList));
+	}
+
 }
