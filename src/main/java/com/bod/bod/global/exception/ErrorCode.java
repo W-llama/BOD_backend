@@ -41,6 +41,7 @@ public enum ErrorCode {
     ALREADY_EXISTS_REJECT_VERIFICATION(409, "이미 챌린지 인증 요청을 거절하였습니다."),
     NOT_FOUND_USER_VERIFICATION(404, "유저의 인증신청 내역이 없습니다."),
     DO_NOT_CANCEL_VERIFICATION(400, "인증 승인 상태로 인증취소는 불가능합니다."),
+    EMPTY_FILE(400, "파일 업로드가 필요합니다."),
 
     // UserChallenge-related errors
     NOT_FOUND_USER_CHALLENGE(404, "해당 유저의 챌린지 신청기록을 찾지 못했습니다."),

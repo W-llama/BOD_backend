@@ -46,6 +46,9 @@ public class VerificationService {
   @Transactional
   public VerificationResponseDto requestVerification(Long challengeId, MultipartFile image, VerificationRequestDto requestDto, User user) {
     try {
+      if(image.isEmpty()) {
+        throw new GlobalException(ErrorCode.EMPTY_FILE);
+      }
       ObjectMetadata metadata= new ObjectMetadata();
       metadata.setContentType(image.getContentType());
       metadata.setContentLength(image.getSize());
@@ -62,7 +65,7 @@ public class VerificationService {
           challengeId, user, startOfDay, endOfDay
       );
 
-      if (checkVerification) {
+      if(checkVerification) {
        throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
       }
 
