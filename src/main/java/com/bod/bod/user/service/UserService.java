@@ -4,11 +4,13 @@ import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
 import com.bod.bod.user.dto.EditProfileRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
+import com.bod.bod.user.dto.PointRankingResponseDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -43,6 +45,9 @@ public interface UserService {
 
 	@Transactional
 	UserResponseDto editPassword(EditPasswordRequestDto editPasswordRequestDto, User user);
+
+  	@Transactional(readOnly = true)
+  	List<PointRankingResponseDto> getRankingList();
 
 	void validateNewPassword(String newPassword, User user);
 
