@@ -8,10 +8,14 @@ import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
+import com.bod.bod.admin.dto.AdminChallengesResponseDto;
+import com.bod.bod.admin.dto.AdminPaginationResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
+import com.bod.bod.admin.dto.AdminUsersResponseDto;
+import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.entity.ConditionStatus;
@@ -25,6 +29,8 @@ import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -50,21 +56,28 @@ public class AdminService {
     @Value("${cloud.aws.s3.bucket}")
     private String BUCKET;
 
-    public Page<User> getAllUsers(int page, int size, String sortBy, boolean isAsc, User user) {
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminPaginationResponseDto<AdminUsersResponseDto> getAllUsers(int page, int size, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
 
-        return userRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userRepository.findAllByOrderByCreatedAtAsc(pageable);
+
+        List<AdminUsersResponseDto> usersDto = users.getContent().stream().map(AdminUsersResponseDto::new).toList();
+
+        return new AdminPaginationResponseDto<>(
+            usersDto,
+            users.getTotalPages(),
+            users.getTotalElements(),
+            users.getNumber(),
+            users.getSize()
+        );
     }
 
     @Transactional
-    public AdminUserUpdateResponseDto updateUser(long userId, AdminUserUpdateRequestDto requestDto, User userDetails) {
-        if (!userDetails.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminUserUpdateResponseDto updateUser(long userId, AdminUserUpdateRequestDto requestDto, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
 
@@ -77,8 +90,8 @@ public class AdminService {
     }
 
     @Transactional
-    public AdminUserStatusUpdateResponseDto updateUserStatus(long userId, AdminUserStatusUpdateRequestDto requestDto, User userDetails) {
-        if (!userDetails.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminUserStatusUpdateResponseDto updateUserStatus(long userId, AdminUserStatusUpdateRequestDto requestDto, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
 
@@ -90,8 +103,8 @@ public class AdminService {
         return new AdminUserStatusUpdateResponseDto(user);
     }
 
-    public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         try {
@@ -120,8 +133,8 @@ public class AdminService {
     }
 
     @Transactional
-    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminChallengeUpdateResponseDto updateChallenge(long challengeId, AdminChallengeUpdateRequestDto reqDto, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         Challenge challenge = challengeRepository.findById(challengeId)
@@ -134,8 +147,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteChallenge(long challengeId, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public void deleteChallenge(long challengeId, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         Challenge challenge = challengeRepository.findById(challengeId)
@@ -145,23 +158,30 @@ public class AdminService {
         challengeRepository.delete(challenge);
     }
 
-    public Page<Verification> getVerifications(long challengeId, int page, int size, String sortBy, boolean isAsc, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminPaginationResponseDto<AdminVerificationGetResponse> getVerifications(long challengeId, int page, int size, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
-        challengeRepository.findById(challengeId)
-            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Verification> verifications = verificationRepository.findAllByChallengeIdOrderByCreatedAtAsc(challengeId, pageable);
+        if (verifications.isEmpty()) {
+            throw new GlobalException(ErrorCode.NOT_FOUND_VERIFICATION);
+        }
+        List<AdminVerificationGetResponse> verificationResponses = verifications.getContent().stream().map(AdminVerificationGetResponse::new).toList();
 
-        return verificationRepository.findAllByChallengeId(challengeId, pageable);
+        return new AdminPaginationResponseDto<>(
+            verificationResponses,
+            verifications.getTotalPages(),
+            verifications.getTotalElements(),
+            verifications.getNumber(),
+            verifications.getSize()
+        );
     }
 
     @Transactional
-    public void approveVerification(long verificationId, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public void approveVerification(long verificationId, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         Verification verification = verificationRepository.findVerificationById(verificationId);
@@ -176,8 +196,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectVerification(long verificationId, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public void rejectVerification(long verificationId, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         Verification verification = verificationRepository.findVerificationById(verificationId);
@@ -193,19 +213,25 @@ public class AdminService {
         }
     }
 
-    public Page<Challenge> getAllChallenges(int page, int size, String sortBy, boolean isAsc, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminPaginationResponseDto<AdminChallengesResponseDto> getAllChallenges(int page, int size, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Challenge> challenges = challengeRepository.findAllByOrderByCreatedAtAsc(pageable);
+        List<AdminChallengesResponseDto> challengesResponseDtos = challenges.getContent().stream().map(AdminChallengesResponseDto::new).toList();
 
-        return challengeRepository.findAll(pageable);
+        return new AdminPaginationResponseDto<>(
+            challengesResponseDtos,
+            challenges.getTotalPages(),
+            challenges.getTotalElements(),
+            challenges.getNumber(),
+            challenges.getSize()
+        );
     }
 
-    public AdminChallengeResponseDto getChallenge(long challengeId, User user) {
-        if (!user.getUserRole().equals(UserRole.ADMIN)) {
+    public AdminChallengeResponseDto getChallenge(long challengeId, User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
         Challenge challenge = challengeRepository.findById(challengeId)

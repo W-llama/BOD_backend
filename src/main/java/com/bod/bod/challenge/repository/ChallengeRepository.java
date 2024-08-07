@@ -17,4 +17,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
 
     Page<Challenge> findAll(Pageable pageable);
     Page<Challenge> findByCategory(Category category, Pageable pageable);
+    Page<Challenge> findAllByOrderByCreatedAtAsc(Pageable pageable);
 }
