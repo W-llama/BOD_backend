@@ -212,16 +212,41 @@ public class UserServiceImpl implements UserService {
 	}
   }
 
+//  @Override
+//  public List<PointRankingResponseDto> getRankingList() {
+//	List<PointRankingResponseDto> rankingList = userRepository.getPointRankingTop5List();
+//	return rankingList;
+//  }
+
   @Override
   public List<PointRankingResponseDto> getRankingList() {
 	String key = "ranking";
 	ZSetOperations<String, String> stringStringZSetOperations = redisTemplate.opsForZSet();
-	Set<ZSetOperations.TypedTuple<String>> typedTuples = stringStringZSetOperations.reverseRangeWithScores(key, 0, 4);
+	Set<ZSetOperations.TypedTuple<String>> typedTuples = stringStringZSetOperations.reverseRangeWithScores(key, 0, 10);
 	List<PointRankingResponseDto> rankingList = typedTuples.stream()
 		.map(tuple -> new PointRankingResponseDto(tuple.getValue(), tuple.getScore()))
 		.toList();
-	return rankingList;
+	return sortRanks(rankingList);
   }
+
+  private List<PointRankingResponseDto> sortRanks(List<PointRankingResponseDto> rankingList) {
+	List<PointRankingResponseDto> rankedList = new ArrayList<>();
+	int rank = 1;
+	int currentRank = 1;
+	long beforePoint = 0;
+
+	for (PointRankingResponseDto dto : rankingList) {
+	  if (dto.getPoint() != beforePoint) {
+		rank = currentRank;
+	  }
+	  dto.setRank(rank);
+	  beforePoint = dto.getPoint();
+	  currentRank++;
+	  rankedList.add(dto);
+	}
+	return rankedList.stream().limit(5).toList();
+  }
+
 
   @Override
   public User findById(long userId) {
