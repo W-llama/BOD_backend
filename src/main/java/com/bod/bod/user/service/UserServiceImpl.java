@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -215,12 +216,19 @@ public class UserServiceImpl implements UserService {
   @Override
   public List<PointRankingResponseDto> getRankingList() {
 	String key = "ranking";
+	try{
 	ZSetOperations<String, String> stringStringZSetOperations = redisTemplate.opsForZSet();
-	Set<ZSetOperations.TypedTuple<String>> typedTuples = stringStringZSetOperations.reverseRangeWithScores(key, 0, 4);
+	Set<ZSetOperations.TypedTuple<String>> typedTuples = stringStringZSetOperations.reverseRangeWithScores(key, 0, 10);
+	  if (typedTuples.isEmpty()) {
+		throw new GlobalException(ErrorCode.EMPTY_POINT_RANKING_LIST);
+	  }
 	List<PointRankingResponseDto> rankingList = typedTuples.stream()
 		.map(tuple -> new PointRankingResponseDto(tuple.getValue(), tuple.getScore()))
 		.toList();
-	return rankingList;
+	return sortRanks(rankingList);
+	} catch (RedisConnectionFailureException e) {
+	  throw new GlobalException(ErrorCode.REDIS_CONNECTION_FAILED);
+	}
   }
 
   @Override
@@ -316,7 +324,6 @@ public class UserServiceImpl implements UserService {
 	user.changeIntroduce(profileRequestDto.getIntroduce());
   }
 
-
   private void savePasswordHistory(User user, String password) {
 	List<UserPasswordHistory> passwordHistories = userPasswordHistoryRepository.findTop3ByUserIdOrderByChangedAtDesc(user.getId());
 	if (passwordHistories.size() >= 3) {
@@ -352,4 +359,21 @@ public class UserServiceImpl implements UserService {
 	);
   }
 
+  private List<PointRankingResponseDto> sortRanks(List<PointRankingResponseDto> rankingList) {
+	List<PointRankingResponseDto> rankedList = new ArrayList<>();
+	int rank = 1;
+	int currentRank = 1;
+	long beforePoint = 0;
+
+	for (PointRankingResponseDto dto : rankingList) {
+	  if (dto.getPoint() != beforePoint) {
+		rank = currentRank;
+	  }
+	  dto.setRank(rank);
+	  beforePoint = dto.getPoint();
+	  currentRank++;
+	  rankedList.add(dto);
+	}
+	return rankedList.stream().limit(5).toList();
+  }
 }
