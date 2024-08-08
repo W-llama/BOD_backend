@@ -29,6 +29,10 @@ public class AdminChallengeCreateResponseDto {
 
     private LocalDateTime createAt;
 
+    private Long limitedUsers;
+
+    private Long joinedUsers;
+
     public AdminChallengeCreateResponseDto(Challenge challenge) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
@@ -39,6 +43,8 @@ public class AdminChallengeCreateResponseDto {
         this.startTime = challenge.getStartTime();
         this.endTime = challenge.getEndTime();
         this.createAt = challenge.getCreatedAt();
+        this.limitedUsers = challenge.getLimitedUsers();
+        this.joinedUsers = challenge.getJoinedUsers();
     }
 
 }

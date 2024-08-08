@@ -14,6 +14,8 @@ public class ChallengeSummaryResponseDto {
   private String content;
   private String imageUrl;
   private Category category;
+  private Long limitedUsers;
+  private Long joinedUsers;
 
   public ChallengeSummaryResponseDto(Challenge challenge) {
 	this.id = challenge.getId();
@@ -21,5 +23,7 @@ public class ChallengeSummaryResponseDto {
 	this.imageUrl = challenge.getImageUrl();
 	this.content = challenge.getContent();
 	this.category = challenge.getCategory();
+    this.limitedUsers = challenge.getLimitedUsers();
+    this.joinedUsers = challenge.getJoinedUsers();
   }
 }

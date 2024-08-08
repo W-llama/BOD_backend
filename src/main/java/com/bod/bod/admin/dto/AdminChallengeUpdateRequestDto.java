@@ -22,4 +22,6 @@ public class AdminChallengeUpdateRequestDto {
 
     private LocalDateTime endTime;
 
+    private Long limitedUsers;
+
 }

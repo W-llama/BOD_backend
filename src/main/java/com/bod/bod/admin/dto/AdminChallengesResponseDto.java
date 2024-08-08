@@ -23,6 +23,10 @@ public class AdminChallengesResponseDto {
 
     private LocalDateTime endTime;
 
+    private Long limitedUsers;
+
+    private Long joinedUsers;
+
     public AdminChallengesResponseDto(Challenge challenge) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
@@ -30,6 +34,8 @@ public class AdminChallengesResponseDto {
         this.conditionStatus = challenge.getConditionStatus();
         this.startTime = challenge.getStartTime();
         this.endTime = challenge.getEndTime();
+        this.limitedUsers = challenge.getLimitedUsers();
+        this.joinedUsers = challenge.getJoinedUsers();
     }
 
 
