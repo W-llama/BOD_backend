@@ -118,12 +118,17 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
 			ObjectMapper objectMapper = new ObjectMapper();
 			JsonNode rootNode = objectMapper.readTree(userInfoResponseBody);
 			String email = rootNode.path("response").path("email").asText();
-
+			String name = rootNode.path("response").path("name").asText();
+			String nickname = rootNode.path("response").path("nickname").asText();
 			Optional<User> optionalUser = userRepository.findByEmail(email);
+
 			User user = optionalUser.orElseGet(() -> {
 				User newUser = User.builder()
 					.email(email)
 					.username(email)
+					.password(passwordEncoder.encode("temporary_password"))
+					.name(name)
+					.nickname(nickname)
 					.userRole(UserRole.USER)
 					.userStatus(UserStatus.ACTIVE)
 					.build();
