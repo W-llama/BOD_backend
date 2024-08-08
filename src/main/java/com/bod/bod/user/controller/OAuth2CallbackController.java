@@ -1,77 +1,32 @@
 package com.bod.bod.user.controller;
 
-import com.bod.bod.user.service.CustomOAuth2UserServiceImpl;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-
+import com.bod.bod.global.dto.CommonResponseDto;
+import com.bod.bod.user.service.OAuth2CallbackServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
-import java.util.logging.Logger;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class OAuth2CallbackController {
 
-	private static final Logger logger = Logger.getLogger(OAuth2CallbackController.class.getName());
-
-	@Value("${spring.security.oauth2.client.registration.naver.client-id}")
-	private String clientId;
-
-	@Value("${spring.security.oauth2.client.registration.naver.client-secret}")
-	private String clientSecret;
-
-	@Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
-	private String redirectUri;
-
-	private final CustomOAuth2UserServiceImpl customOAuth2UserService;
+	private final OAuth2CallbackServiceImpl oAuth2CallbackService;
 
 	@PostMapping("/naver")
-	public ResponseEntity<String> naverCallback(
-		@RequestBody Map<String, String> params
+	public ResponseEntity<CommonResponseDto<Void>> naverCallback(
+		@RequestBody Map<String, String> params,
+		HttpServletResponse httpServletResponse
 	) {
-		String code = params.get("code");
-		String state = params.get("state");
+		oAuth2CallbackService.handleNaverLogin(params, httpServletResponse);
 
-		if (code == null || state == null) {
-			return ResponseEntity.badRequest().body("Missing required parameters");
-		}
-
-		String tokenUrl = "https://nid.naver.com/oauth2.0/token?grant_type=authorization_code"
-			+ "&client_id=" + clientId
-			+ "&client_secret=" + clientSecret
-			+ "&redirect_uri=" + redirectUri
-			+ "&code=" + code
-			+ "&state=" + state;
-
-		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<String> response = restTemplate.getForEntity(tokenUrl, String.class);
-
-		if (response.getStatusCode() != HttpStatus.OK) {
-			return ResponseEntity.status(response.getStatusCode()).body("Failed to get access token from Naver.");
-		}
-
-		String accessToken = customOAuth2UserService.extractAccessToken(response.getBody());
-		String userInfoUrl = "https://openapi.naver.com/v1/nid/me";
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", "Bearer " + accessToken);
-		HttpEntity<String> entity = new HttpEntity<>(headers);
-
-		ResponseEntity<String> userInfoResponse = restTemplate.exchange(userInfoUrl, HttpMethod.GET, entity, String.class);
-
-		if (userInfoResponse.getStatusCode() != HttpStatus.OK) {
-			return ResponseEntity.status(userInfoResponse.getStatusCode()).body("Failed to get user info from Naver.");
-		}
-
-		String jwtToken = customOAuth2UserService.processNaverLogin(userInfoResponse.getBody());
-
-		if (jwtToken == null) {
-			throw new RuntimeException("Failed to process Naver login");
-		}
-
-		return ResponseEntity.ok(jwtToken);
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "네이버 로그인이 완료되었습니다.", null));
 	}
 }

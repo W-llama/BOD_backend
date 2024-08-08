@@ -10,8 +10,6 @@ import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.user.oauth2.NaverUserResponseDto;
 import com.bod.bod.user.oauth2.GoogleUserResponseDto;
 import com.bod.bod.user.oauth2.OAuth2UserInfo;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -101,43 +99,5 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
 			.role(UserRole.USER)
 			.userStatus(UserStatus.ACTIVE)
 			.build();
-	}
-
-	public String extractAccessToken(String responseBody) {
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonNode rootNode = objectMapper.readTree(responseBody);
-			return rootNode.path("access_token").asText();
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to extract access token", e);
-		}
-	}
-
-	public String processNaverLogin(String userInfoResponseBody) {
-		try {
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonNode rootNode = objectMapper.readTree(userInfoResponseBody);
-			String email = rootNode.path("response").path("email").asText();
-			String name = rootNode.path("response").path("name").asText();
-			String nickname = rootNode.path("response").path("nickname").asText();
-			Optional<User> optionalUser = userRepository.findByEmail(email);
-
-			User user = optionalUser.orElseGet(() -> {
-				User newUser = User.builder()
-					.email(email)
-					.username(email)
-					.password(passwordEncoder.encode("temporary_password"))
-					.name(name)
-					.nickname(nickname)
-					.userRole(UserRole.USER)
-					.userStatus(UserStatus.ACTIVE)
-					.build();
-				return userRepository.save(newUser);
-			});
-
-			return jwtUtil.createAccessToken(user.getUsername(), user.getUserRole());
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to process Naver login", e);
-		}
 	}
 }
