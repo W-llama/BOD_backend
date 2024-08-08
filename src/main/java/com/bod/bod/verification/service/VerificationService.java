@@ -3,7 +3,7 @@ package com.bod.bod.verification.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.bod.bod.challenge.dto.PaginationResponse;
+import com.bod.bod.global.dto.PaginationResponse;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.service.ChallengeService;
 import com.bod.bod.global.exception.ErrorCode;

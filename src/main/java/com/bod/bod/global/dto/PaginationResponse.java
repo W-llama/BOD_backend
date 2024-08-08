@@ -1,4 +1,4 @@
-package com.bod.bod.challenge.dto;
+package com.bod.bod.global.dto;
 
 import java.util.List;
 import lombok.Getter;
