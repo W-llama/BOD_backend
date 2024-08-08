@@ -1,6 +1,6 @@
 package com.bod.bod.verification.controller;
 
-import com.bod.bod.challenge.dto.PaginationResponse;
+import com.bod.bod.global.dto.PaginationResponse;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
 import com.bod.bod.verification.dto.VerificationRequestDto;
