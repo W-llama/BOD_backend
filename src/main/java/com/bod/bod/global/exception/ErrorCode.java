@@ -26,6 +26,8 @@ public enum ErrorCode {
     INVALID_USER_STATUS(403, "회원 탈퇴한 유저입니다."),
     INVALID_USERNAME(404, "아이디가 일치하지 않습니다."),
     INVALID_NEW_PASSWORD(400, "최근 3개의 비밀번호와 일치함으로 변경할 수 없습니다."),
+    REDIS_CONNECTION_FAILED(500, "레디스와 연결이 되어있지 않습니다."),
+    EMPTY_POINT_RANKING_LIST(204, "현재 포인트 적립내역이 없습니다."),
 
     // Challenge-related errors
     NOT_FOUND_CHALLENGE(404, "해당 챌린지는 존재하지 않습니다."),
@@ -41,6 +43,7 @@ public enum ErrorCode {
     ALREADY_EXISTS_REJECT_VERIFICATION(409, "이미 챌린지 인증 요청을 거절하였습니다."),
     NOT_FOUND_USER_VERIFICATION(404, "유저의 인증신청 내역이 없습니다."),
     DO_NOT_CANCEL_VERIFICATION(400, "인증 승인 상태로 인증취소는 불가능합니다."),
+    EMPTY_FILE(400, "파일 업로드가 필요합니다."),
 
     // UserChallenge-related errors
     NOT_FOUND_USER_CHALLENGE(404, "해당 유저의 챌린지 신청기록을 찾지 못했습니다."),
