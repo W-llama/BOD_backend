@@ -14,5 +14,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByNickname(String nickname);
 
-	Page<User> findAll(Pageable pageable);
+	Page<User> findAllByOrderByCreatedAtAsc(Pageable pageable);
 }

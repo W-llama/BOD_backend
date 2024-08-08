@@ -3,7 +3,7 @@ package com.bod.bod.challenge.service;
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.challenge.dto.ChallengeSummaryResponseDto;
 import com.bod.bod.challenge.dto.ChallengeUserListDto;
-import com.bod.bod.challenge.dto.PaginationResponse;
+import com.bod.bod.global.dto.PaginationResponse;
 import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.challenge.entity.ConditionStatus;

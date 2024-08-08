@@ -13,15 +13,11 @@ import com.bod.bod.admin.dto.AdminUserUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUsersResponseDto;
 import com.bod.bod.admin.dto.AdminVerificationGetResponse;
 import com.bod.bod.admin.service.AdminService;
-import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.dto.CommonResponseDto;
+import com.bod.bod.global.dto.PaginationResponse;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
-import com.bod.bod.user.entity.User;
-import com.bod.bod.verification.entity.Verification;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -46,18 +42,12 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/admins/users")
-    public ResponseEntity<CommonResponseDto<List<AdminUsersResponseDto>>> getAllUsers(
+    public ResponseEntity<CommonResponseDto<PaginationResponse<AdminUsersResponseDto>>> getAllUsers(
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "100") int size,
-        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @RequestParam(value = "size", defaultValue = "10") int size,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<User> responseDto = adminService.getAllUsers(page - 1, size, sortBy, isAsc, userDetails.getUser());
-
-        List<AdminUsersResponseDto> usersList = responseDto.stream()
-            .map(AdminUsersResponseDto::new)
-            .toList();
+        PaginationResponse<AdminUsersResponseDto> usersList = adminService.getAllUsers(page-1,size,userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "전체 회원 조회에 성공하였습니다!", usersList));
     }
@@ -117,19 +107,13 @@ public class AdminController {
     }
 
     @GetMapping("/admins/challenges/{challengeId}/verifications")
-    public ResponseEntity<CommonResponseDto<List<AdminVerificationGetResponse>>> getVerifications(
+    public ResponseEntity<CommonResponseDto<PaginationResponse<AdminVerificationGetResponse>>> getVerifications(
         @PathVariable(name = "challengeId") Long challengeId,
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "100") int size,
-        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @RequestParam(value = "size", defaultValue = "10") int size,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<Verification> responseDto = adminService.getVerifications(challengeId, page - 1, size, sortBy, isAsc, userDetails.getUser());
-
-        List<AdminVerificationGetResponse> verifications = responseDto.stream()
-            .map(AdminVerificationGetResponse::new)
-            .toList();
+        PaginationResponse<AdminVerificationGetResponse> verifications = adminService.getVerifications(challengeId, page - 1, size, userDetails.getUser());
 
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 인증 요청 목록 조회에 성공하였습니다!", verifications));
@@ -156,18 +140,13 @@ public class AdminController {
     }
 
     @GetMapping("/admins/challenges")
-    public ResponseEntity<CommonResponseDto<List<AdminChallengesResponseDto>>> getAllChallenges(
+    public ResponseEntity<CommonResponseDto<PaginationResponse<AdminChallengesResponseDto>>> getAllChallenges(
         @RequestParam(value = "page", defaultValue = "1") int page,
-        @RequestParam(value = "size", defaultValue = "100") int size,
-        @RequestParam(value = "sortBy", defaultValue = "createdAt") String sortBy,
-        @RequestParam(value = "isAsc", defaultValue = "true") boolean isAsc,
+        @RequestParam(value = "size", defaultValue = "10") int size,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        Page<Challenge> responseDto = adminService.getAllChallenges(page - 1, size, sortBy, isAsc, userDetails.getUser());
+        PaginationResponse<AdminChallengesResponseDto> challengeList = adminService.getAllChallenges(page - 1, size, userDetails.getUser());
 
-        List<AdminChallengesResponseDto> challengeList = responseDto.stream()
-            .map(AdminChallengesResponseDto::new)
-            .toList();
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "전체 챌린지 조회에 성공하였습니다!", challengeList));
     }

@@ -17,7 +17,7 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
             () -> new GlobalException(ErrorCode.NOT_FOUND_VERIFICATION));
     }
 
-    Page<Verification> findAllByChallengeId(long challengeId, Pageable pageable);
+    Page<Verification> findAllByChallengeIdOrderByCreatedAtAsc(long challengeId, Pageable pageable);
 
     boolean existsByChallengeIdAndUserAndCreatedAtBetween(
         Long challengeId,
