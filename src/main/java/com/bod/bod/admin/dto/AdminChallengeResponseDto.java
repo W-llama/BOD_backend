@@ -25,6 +25,10 @@ public class AdminChallengeResponseDto {
 
     private String content;
 
+    private Long limitedUsers;
+
+    private Long joinedUsers;
+
     public AdminChallengeResponseDto(Challenge challenge) {
         this.challengeId = challenge.getId();
         this.title = challenge.getTitle();
@@ -33,5 +37,7 @@ public class AdminChallengeResponseDto {
         this.startTime = challenge.getStartTime();
         this.endTime = challenge.getEndTime();
         this.content = challenge.getContent();
+        this.limitedUsers = challenge.getLimitedUsers();
+        this.joinedUsers = challenge.getJoinedUsers();
     }
 }

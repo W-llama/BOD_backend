@@ -33,6 +33,7 @@ public enum ErrorCode {
     NOT_FOUND_CHALLENGE(404, "해당 챌린지는 존재하지 않습니다."),
     DUPLICATE_CHALLENGE(409, "이미 신청한 챌린지입니다."),
     COMPLETE_CHALLENGE(400, "마감된 챌린지이므로 참여할 수 없습니다."),
+    LIMIT_FULL_CHALLENGE(400, "제한인원이 가득 차서 참여할 수 없습니다."),
 
     // Verification-related errors
     EMPTY_VERIFICATION(404, "해당 챌린지에는 현재까지 인증 신청 내역이 없습니다."),

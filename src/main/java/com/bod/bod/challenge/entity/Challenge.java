@@ -62,17 +62,34 @@ public class Challenge extends TimeStamp {
     @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
+    @Column(name = "limited_users", nullable = false)
+    private Long limitedUsers;
+
+    @Builder.Default
+    @Column(name = "joined_users", nullable = false)
+    private Long joinedUsers = 0L;
+
+
     @Builder.Default
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserChallenge> userChallenges = new ArrayList<>();
 
-    public void changeChallenge (String title, String content, Category category, ConditionStatus conditionStatus, LocalDateTime startTime, LocalDateTime endTime) {
+    public void changeChallenge (String title, String content, Category category, ConditionStatus conditionStatus, LocalDateTime startTime, LocalDateTime endTime, Long limitedUsers) {
         this.title = title;
         this.content = content;
         this.category = category;
         this.conditionStatus = conditionStatus;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.limitedUsers = limitedUsers;
+    }
+
+    public void increaseJoinedUsers() {
+        joinedUsers++;
+    }
+
+    public void decreaseJoinedUsers() {
+        joinedUsers--;
     }
 
 }

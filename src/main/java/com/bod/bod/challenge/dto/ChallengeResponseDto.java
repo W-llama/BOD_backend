@@ -21,6 +21,8 @@ public class ChallengeResponseDto {
     private LocalDateTime endTime;
     private LocalDateTime createAt;
     private int completionRate;
+    private Long limitedUsers;
+    private Long joinedUsers;
 
     // 기본 생성자
     public ChallengeResponseDto(Challenge challenge) {
@@ -33,6 +35,8 @@ public class ChallengeResponseDto {
         this.startTime = challenge.getStartTime();
         this.endTime = challenge.getEndTime();
         this.createAt = challenge.getCreatedAt();
+        this.limitedUsers = challenge.getLimitedUsers();
+        this.joinedUsers = challenge.getJoinedUsers();
     }
 
     public ChallengeResponseDto(Challenge challenge, int verificationCount) {

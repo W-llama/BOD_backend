@@ -1,6 +1,5 @@
 package com.bod.bod.admin.dto;
 
-import com.bod.bod.challenge.entity.ConditionStatus;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
@@ -18,5 +17,7 @@ public class AdminChallengeCreateRequestDto {
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
+
+    private Long limitedUsers;
 
 }
