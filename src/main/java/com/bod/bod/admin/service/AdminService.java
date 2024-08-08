@@ -112,16 +112,16 @@ public class AdminService {
             amazonS3Client.putObject(BUCKET, "challenge/" + image.getOriginalFilename(), image.getInputStream(), metadata);
 
             String imageUrl = amazonS3Client.getResourceUrl(BUCKET, "challenge/" + image.getOriginalFilename());
-            Category category = Category.valueOf(reqDto.getCategory());
             Challenge challenge = Challenge.builder()
                 .title(reqDto.getTitle())
                 .content(reqDto.getContent())
                 .image(image.getOriginalFilename())
                 .imageUrl(imageUrl)
-                .category(category)
+                .category(Category.valueOf(reqDto.getCategory()))
                 .conditionStatus(ConditionStatus.valueOf(reqDto.getConditionStatus()))
                 .startTime(reqDto.getStartTime())
                 .endTime(reqDto.getEndTime())
+                .limitedUsers(reqDto.getLimitedUsers())
                 .build();
             Challenge savedChallenge = challengeRepository.save(challenge);
             return new AdminChallengeCreateResponseDto(savedChallenge);
@@ -139,7 +139,7 @@ public class AdminService {
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
         challenge.changeChallenge(reqDto.getTitle(), reqDto.getContent(), reqDto.getCategory(),
-            reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime());
+            reqDto.getConditionStatus(), reqDto.getStartTime(), reqDto.getEndTime(), reqDto.getLimitedUsers());
 
         return new AdminChallengeUpdateResponseDto(challenge);
     }

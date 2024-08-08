@@ -80,13 +80,19 @@ public class ChallengeService {
 
     @Transactional
     public ChallengeResponseDto addUserToChallenge(Long challengeId, User user){
-        Challenge challenge = challengeRepository.findChallengeById(challengeId);
+        Challenge challenge = challengeRepository.findByIdWithPessimisticLock(challengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
         if (challenge.getConditionStatus().equals(ConditionStatus.COMPLETE)) {
             throw new GlobalException(ErrorCode.COMPLETE_CHALLENGE);
         }
         Optional<UserChallenge> existingUserChallenge = userChallengeRepository.findByUserAndChallenge(user, challenge);
         if(existingUserChallenge.isPresent()){
             throw new GlobalException(ErrorCode.DUPLICATE_CHALLENGE);
+        }
+        if (challenge.getJoinedUsers() >= challenge.getLimitedUsers()) {
+            throw new GlobalException(ErrorCode.LIMIT_FULL_CHALLENGE);
+        } else {
+            challenge.increaseJoinedUsers();
         }
         UserChallenge userChallenge = UserChallenge.builder()
             .user(user)
@@ -111,6 +117,10 @@ public class ChallengeService {
     public void deleteChallenge(long challengeId, User user) {
         UserChallenge userChallenge = userChallengeRepository.findByUserAndChallenge(user, findById(challengeId))
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_USER_CHALLENGE));
+
+        Challenge challenge = challengeRepository.findByIdWithPessimisticLock(challengeId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
+        challenge.decreaseJoinedUsers();
 
         userChallengeRepository.delete(userChallenge);
     }

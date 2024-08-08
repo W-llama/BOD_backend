@@ -4,9 +4,15 @@ import com.bod.bod.challenge.entity.Category;
 import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.QueryHint;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 
 public interface ChallengeRepository extends JpaRepository<Challenge, Long>, ChallengeCustomRepository {
 
@@ -18,4 +24,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
     Page<Challenge> findAll(Pageable pageable);
     Page<Challenge> findByCategory(Category category, Pageable pageable);
     Page<Challenge> findAllByOrderByCreatedAtAsc(Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_READ)
+    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "3000")})  // timeout 설정 (3초)
+    @Query("select c from Challenge c where c.id in :id")
+    Optional<Challenge> findByIdWithPessimisticLock(Long id);
 }
