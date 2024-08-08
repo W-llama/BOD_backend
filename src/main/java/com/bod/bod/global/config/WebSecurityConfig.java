@@ -86,7 +86,7 @@ public class WebSecurityConfig {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedOrigins("http://3.37.71.106:8081")
+					.allowedOrigins("http://challengersbod.store")
 					.exposedHeaders("authorization") // 이 부분을 추가합니다.
 					.allowCredentials(true) // 쿠키 인증 요청 허용
 					.allowedHeaders("*")
