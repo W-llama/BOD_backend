@@ -1,5 +1,6 @@
 package com.bod.bod.global.config;
 
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,6 @@ public class RedisConfig {
   @Bean
   public RedisConnectionFactory redisConnectionFactory() {
 	final RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-
 	redisStandaloneConfiguration.setHostName(host);
 	redisStandaloneConfiguration.setPort(port);
 	redisStandaloneConfiguration.setPassword((password));
@@ -40,4 +40,12 @@ public class RedisConfig {
 	return redisTemplate;
   }
 
+  @Bean
+  public RedisTemplate<String, Map<String, String>> redisEmailAuthenticationTemplate() {
+	RedisTemplate<String, Map<String, String>> redisTemplate = new RedisTemplate<>();
+	redisTemplate.setConnectionFactory(redisConnectionFactory());
+	redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+	redisTemplate.setHashValueSerializer(new StringRedisSerializer());
+	return redisTemplate;
+  }
 }
