@@ -2,8 +2,6 @@ package com.bod.bod.global.config;
 
 import com.bod.bod.global.jwt.JwtUtil;
 import com.bod.bod.global.jwt.security.JwtAuthorizationFilter;
-import com.bod.bod.global.jwt.security.OAuth2.CustomOAuth2FailureHandler;
-import com.bod.bod.global.jwt.security.OAuth2.CustomOAuth2SuccessHandler;
 import com.bod.bod.global.jwt.security.UserDetailServiceImpl;
 import com.bod.bod.user.service.CustomOAuth2UserServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,8 +29,6 @@ public class WebSecurityConfig {
 	private final UserDetailServiceImpl userDetailsService;
 	private final JwtUtil jwtUtil;
 	private final CustomOAuth2UserServiceImpl customOAuth2UserService;
-	private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
-	private final CustomOAuth2FailureHandler customOAuth2FailureHandler;
 
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -70,9 +66,7 @@ public class WebSecurityConfig {
 				}))
 
 			.oauth2Login(oauth2 -> oauth2
-				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService))
-				.successHandler(customOAuth2SuccessHandler)
-				.failureHandler(customOAuth2FailureHandler))
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)))
 
 			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 

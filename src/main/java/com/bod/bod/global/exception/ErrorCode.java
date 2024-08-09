@@ -17,6 +17,13 @@ public enum ErrorCode {
     NOT_FOUND_EMAIL(400, "등록되지 않은 이메일입니다."),
     MISMATCH_VERIFICATION_CODE(400, "이메일 인증코드가 일치하지 않습니다."),
 
+    //Oauth2
+    MISSING_REQUIRED_PARAMETERS(400, "필수 매개변수가 누락되었습니다."),
+    FAILED_TO_GET_ACCESS_TOKEN_FROM_NAVER(500, "네이버로부터 액세스 토큰을 가져오는데 실패했습니다."),
+    FAILED_TO_GET_USER_INFO_FROM_NAVER(500, "네이버로부터 사용자 정보를 가져오는데 실패했습니다."),
+    FAILED_TO_PROCESS_NAVER_LOGIN(500, "네이버 로그인을 처리하는데 실패했습니다."),
+    FAILED_TO_EXTRACT_ACCESS_TOKEN(500, "네이버 액세스 토큰을 추출하는데 실패했습니다"),
+
     // User-related errors
     ALREADY_NICKNAME(409, "해당 닉네임은 이미 사용 중입니다."),
     ALREADY_USERNAME(409, "해당 아이디는 이미 사용 중입니다."),
