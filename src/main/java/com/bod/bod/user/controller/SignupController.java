@@ -28,7 +28,8 @@ public class SignupController {
   ) {
 	boolean exists = signUpService.checkUsernameExists(request.get("username"));
 	return ResponseEntity.ok()
-		.body(new CommonResponseDto<>(HttpStatus.OK.value(), exists ? "아이디가 이미 존재합니다." : "아이디가 사용 가능합니다.", exists));
+		.body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), exists ? "아이디가 이미 존재합니다!" : "아이디가 사용 가능합니다!", exists));
   }
 
   @PostMapping("/check-email")
