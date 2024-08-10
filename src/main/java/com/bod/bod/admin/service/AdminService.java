@@ -1,8 +1,5 @@
 package com.bod.bod.admin.service;
 
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeResponseDto;
@@ -21,17 +18,15 @@ import com.bod.bod.challenge.entity.ConditionStatus;
 import com.bod.bod.challenge.repository.ChallengeRepository;
 import com.bod.bod.global.dto.PaginationResponse;
 import com.bod.bod.global.exception.ErrorCode;
-import com.bod.bod.global.exception.FileUploadFailureException;
 import com.bod.bod.global.exception.GlobalException;
+import com.bod.bod.global.service.S3Service;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
-import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,12 +42,8 @@ public class AdminService {
     private final UserRepository userRepository;
     private final ChallengeRepository challengeRepository;
     private final VerificationRepository verificationRepository;
-
-    private final AmazonS3Client amazonS3Client;
+    private final S3Service s3Service;
     private final RedisTemplate<String, String> redisTemplate;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String BUCKET;
 
     public PaginationResponse<AdminUsersResponseDto> getAllUsers(int page, int size, User loginUser) {
         if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
@@ -101,17 +92,13 @@ public class AdminService {
         return new AdminUserStatusUpdateResponseDto(user);
     }
 
+    @Transactional
     public AdminChallengeCreateResponseDto createChallenge(MultipartFile image, AdminChallengeCreateRequestDto reqDto, User loginUser) {
         if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
-        try {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(image.getContentType());
-            metadata.setContentLength(image.getSize());
-            amazonS3Client.putObject(BUCKET, "challenge/" + image.getOriginalFilename(), image.getInputStream(), metadata);
-
-            String imageUrl = amazonS3Client.getResourceUrl(BUCKET, "challenge/" + image.getOriginalFilename());
+            String key = "challenge/";
+            String imageUrl = s3Service.imageUpload(image, key);
             Challenge challenge = Challenge.builder()
                 .title(reqDto.getTitle())
                 .content(reqDto.getContent())
@@ -125,9 +112,7 @@ public class AdminService {
                 .build();
             Challenge savedChallenge = challengeRepository.save(challenge);
             return new AdminChallengeCreateResponseDto(savedChallenge);
-        } catch (IOException e) {
-            throw new FileUploadFailureException("파일 업로드 실패");
-        }
+
     }
 
     @Transactional
@@ -151,8 +136,8 @@ public class AdminService {
         }
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
-        DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, "challenge/" + challenge.getImage());
-        amazonS3Client.deleteObject(request);
+        String key = "challenge/";
+        s3Service.deleteChallengeImage(challenge, key);
         challengeRepository.delete(challenge);
     }
 
