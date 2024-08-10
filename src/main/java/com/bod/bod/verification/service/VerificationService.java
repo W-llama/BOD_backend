@@ -39,18 +39,8 @@ public class VerificationService {
   public VerificationResponseDto requestVerification(Long challengeId, MultipartFile image, VerificationRequestDto requestDto, User user) {
       Challenge challenge = challengeService.findById(challengeId);
 
-      LocalDateTime currentDateTime = LocalDateTime.now();
-      LocalDate currentDate = currentDateTime.toLocalDate();
-      LocalDateTime startOfDay = currentDate.atStartOfDay();
-      LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
+      duplicateVerification(challengeId, user);
 
-      boolean checkVerification = verificationRepository.existsByChallengeIdAndUserAndCreatedAtBetween(
-          challengeId, user, startOfDay, endOfDay
-      );
-
-      if(checkVerification) {
-       throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
-      }
       String key = "verification/";
       String imageUrl = s3Service.imageUpload(image, key);
       Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
@@ -111,4 +101,18 @@ public class VerificationService {
     return verificationRepository.findVerificationById(verificationId);
   }
 
+  private void duplicateVerification(Long challengeId, User user) {
+    LocalDateTime currentDateTime = LocalDateTime.now();
+    LocalDate currentDate = currentDateTime.toLocalDate();
+    LocalDateTime startOfDay = currentDate.atStartOfDay();
+    LocalDateTime endOfDay = currentDate.atTime(LocalTime.MAX);
+
+    boolean checkVerification = verificationRepository.existsByChallengeIdAndUserAndCreatedAtBetween(
+        challengeId, user, startOfDay, endOfDay
+    );
+
+    if(checkVerification) {
+      throw new GlobalException(ErrorCode.ALREADY_EXISTS_VERIFICATION);
+    }
+  }
 }
