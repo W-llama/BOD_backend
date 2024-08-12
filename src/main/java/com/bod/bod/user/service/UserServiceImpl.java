@@ -20,6 +20,7 @@ import com.bod.bod.user.repository.UserPasswordHistoryRepository;
 import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.userchallenge.entity.UserChallenge;
 import com.bod.bod.userchallenge.repository.UserChallengeRepository;
+import com.bod.bod.verification.entity.Status;
 import com.bod.bod.verification.repository.VerificationRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -135,8 +136,8 @@ public class UserServiceImpl implements UserService {
 	userChallengeSlice.forEach(userChallenge -> {
 
 	  Challenge challenge = userChallenge.getChallenge();
-	  int verificationCount = verificationRepository.countByChallengeAndUser(challenge, user);
-	  ChallengeResponseDto challengeResponseDto = new ChallengeResponseDto(challenge, verificationCount);
+	  int verificationApprovedCount = verificationRepository.countByChallengeAndUserAndStatus(challenge, user, Status.APPROVE);
+	  ChallengeResponseDto challengeResponseDto = new ChallengeResponseDto(challenge, verificationApprovedCount);
 
 	  switch (challenge.getConditionStatus()) {
 		case COMPLETE:
