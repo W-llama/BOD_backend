@@ -4,6 +4,7 @@ import com.bod.bod.challenge.entity.Challenge;
 import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.user.entity.User;
+import com.bod.bod.verification.entity.Status;
 import com.bod.bod.verification.entity.Verification;
 import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
@@ -26,5 +27,5 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
         LocalDateTime endOfDay
     );
 
-    int countByChallengeAndUser(Challenge challenge, User user);
+    int countByChallengeAndUserAndStatus(Challenge challenge, User user, Status status);
 }
