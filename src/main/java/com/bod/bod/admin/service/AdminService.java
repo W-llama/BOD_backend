@@ -1,5 +1,6 @@
 package com.bod.bod.admin.service;
 
+import com.bod.bod.admin.dto.AdminChallengeCountResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeResponseDto;
@@ -221,5 +222,22 @@ public class AdminService {
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
 
         return new AdminChallengeResponseDto(challenge);
+    }
+
+    public AdminChallengeCountResponseDto getChallengeCounts(User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
+        long challengesCount = challengeRepository.countAllChallenges();
+        long beforeChallengesCount = challengeRepository.countBeforeChallenges();
+        long todoChallengesCount = challengeRepository.countTodoChallenges();
+        long completeChallengesCount = challengeRepository.countCompleteChallenges();
+
+        return new AdminChallengeCountResponseDto(
+            challengesCount,
+            beforeChallengesCount,
+            todoChallengesCount,
+            completeChallengesCount
+        );
     }
 }
