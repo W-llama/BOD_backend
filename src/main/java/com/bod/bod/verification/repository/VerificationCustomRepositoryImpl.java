@@ -1,6 +1,7 @@
 package com.bod.bod.verification.repository;
 
 import com.bod.bod.challenge.entity.QChallenge;
+import com.bod.bod.user.entity.QUser;
 import com.bod.bod.user.entity.User;
 import com.bod.bod.verification.dto.VerificationTop3UserResponseDto;
 import com.bod.bod.verification.dto.VerificationWithChallengeResponseDto;
@@ -44,14 +45,18 @@ public class VerificationCustomRepositoryImpl implements VerificationCustomRepos
 
   public List<VerificationTop3UserResponseDto> getTop3VerificationUsers(Long challengeId) {
 	QVerification verification = QVerification.verification;
-	QChallenge challenge = QChallenge.challenge;
+	QUser user = QUser.user;
 
 	List<VerificationTop3UserResponseDto> top3VerificationUserList = queryFactory
-		.select(Projections.constructor(VerificationTop3UserResponseDto.class, verification))
+		.select(Projections.constructor(VerificationTop3UserResponseDto.class,
+			verification.id,
+			user.name,
+			user.nickname))
 		.from(verification)
+		.join(verification.user, user)
 		.where(verification.challenge.id.eq(challengeId).and(verification.status.eq(Status.APPROVE)))
-		.groupBy(verification.user.id, verification.user.name, verification.user.nickname)
-		.orderBy(verification.user.id.count().desc())
+		.groupBy(verification.id, user.name, user.nickname)
+		.orderBy(verification.count().desc())
 		.limit(3)
 		.fetch();
 	return top3VerificationUserList;
