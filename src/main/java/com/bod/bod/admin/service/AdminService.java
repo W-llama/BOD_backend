@@ -7,6 +7,7 @@ import com.bod.bod.admin.dto.AdminChallengeResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengesResponseDto;
+import com.bod.bod.admin.dto.AdminUserCountResponseDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateRequestDto;
 import com.bod.bod.admin.dto.AdminUserStatusUpdateResponseDto;
 import com.bod.bod.admin.dto.AdminUserUpdateRequestDto;
@@ -238,6 +239,25 @@ public class AdminService {
             beforeChallengesCount,
             todoChallengesCount,
             completeChallengesCount
+        );
+    }
+
+    public AdminUserCountResponseDto getUserCounts(User loginUser) {
+        if (!loginUser.getUserRole().equals(UserRole.ADMIN)) {
+            throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
+        }
+        long usersCount = userRepository.countAllUsers();
+        long activeUsersCount = userRepository.countActiveUsers();
+        long withdrawUsersCount = userRepository.countWithdrawUsers();
+        long adminUsersCount = userRepository.countAdminUsers();
+        long userUsersCount = userRepository.countUserUsers();
+
+        return new AdminUserCountResponseDto(
+            usersCount,
+            activeUsersCount,
+            withdrawUsersCount,
+            adminUsersCount,
+            userUsersCount
         );
     }
 }
