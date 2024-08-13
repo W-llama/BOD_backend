@@ -1,5 +1,6 @@
 package com.bod.bod.admin.controller;
 
+import com.bod.bod.admin.dto.AdminChallengeCountResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateRequestDto;
 import com.bod.bod.admin.dto.AdminChallengeCreateResponseDto;
 import com.bod.bod.admin.dto.AdminChallengeResponseDto;
@@ -159,5 +160,14 @@ public class AdminController {
         AdminChallengeResponseDto responseDto = adminService.getChallenge(challengeId, userDetails.getUser());
         return ResponseEntity.ok().body(new CommonResponseDto<>
             (HttpStatus.OK.value(), "챌린지 조회에 성공하였습니다!", responseDto));
+    }
+
+    @GetMapping("/admins/challenges/counts")
+    public ResponseEntity<CommonResponseDto<AdminChallengeCountResponseDto>> getChallengeCounts(
+        @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        AdminChallengeCountResponseDto responseDto = adminService.getChallengeCounts(userDetails.getUser());
+        return ResponseEntity.ok().body(new CommonResponseDto<>
+            (HttpStatus.OK.value(), "챌린지 수 조회에 성공하였습니다!", responseDto));
     }
 }
