@@ -143,7 +143,7 @@ public class S3ServiceImpl implements S3Service {
 
   private void allowedImageTypes(MultipartFile image) {
 	String fileName = image.getOriginalFilename();
-	if (fileName == null || !fileName.matches(".*\\.(jpg|jpeg|png|gif)$")) {
+	if (fileName == null || !fileName.matches("(?i).*\\.(jpg|jpeg|png|gif)$")) {
 	  throw new InvalidFileTypeException("지원되지 않는 파일 형식입니다: " + fileName);
 	}
   }
