@@ -15,7 +15,7 @@ public class SignUpRequestDto {
 
 	@NotBlank(message = "Email is mandatory")
 	@Email(message = "Email should be valid")
-	@Size(max = 20, message = "Email must be less than 20 characters")
+	@Size(max = 50, message = "Email must be less than 50 characters")
 	private String email;
 
 	@NotBlank(message = "Password is mandatory")
