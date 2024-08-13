@@ -88,7 +88,7 @@ public class JwtUtil {
 			.path("/")
 			.sameSite("None")
 			.httpOnly(true)
-			.secure(false)
+			.secure(true)
 			.maxAge((int) refreshTokenExpireTime)
 			.build();
 
