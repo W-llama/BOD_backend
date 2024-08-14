@@ -26,6 +26,7 @@ import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.verification.entity.Verification;
 import com.bod.bod.verification.repository.VerificationRepository;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -98,11 +99,12 @@ public class AdminService {
             throw new GlobalException(ErrorCode.USER_ACCESS_DENIED);
         }
             String key = "challenge/";
-            String imageUrl = s3Service.imageUpload(image, key);
+            String uniqueFileName = key + UUID.randomUUID() + "_" + image.getOriginalFilename();
+            String imageUrl = s3Service.imageUpload(image, uniqueFileName);
             Challenge challenge = Challenge.builder()
                 .title(reqDto.getTitle())
                 .content(reqDto.getContent())
-                .image(image.getOriginalFilename())
+                .image(uniqueFileName)
                 .imageUrl(imageUrl)
                 .category(Category.valueOf(reqDto.getCategory()))
                 .conditionStatus(ConditionStatus.valueOf(reqDto.getConditionStatus()))
@@ -136,8 +138,7 @@ public class AdminService {
         }
         Challenge challenge = challengeRepository.findById(challengeId)
             .orElseThrow(() -> new GlobalException(ErrorCode.NOT_FOUND_CHALLENGE));
-        String key = "challenge/";
-        s3Service.deleteChallengeImage(challenge, key);
+        s3Service.deleteChallengeImage(challenge);
         challengeRepository.delete(challenge);
     }
 
