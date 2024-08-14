@@ -176,7 +176,7 @@ public class AdminService {
             verification.changeStatusApprove();
             User verifiedUser = verification.getUser();
             verifiedUser.increasePoint();
-            redisTemplate.opsForZSet().add("ranking", verifiedUser.getNickname(), verifiedUser.getPoint());
+            redisTemplate.opsForZSet().add("ranking", verifiedUser.getName(), verifiedUser.getPoint());
         }
     }
 
