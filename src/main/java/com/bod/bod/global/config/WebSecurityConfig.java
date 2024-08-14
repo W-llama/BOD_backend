@@ -36,7 +36,7 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public JwtAuthorizationFilter jwtAuthenticationFilter() {
+	public JwtAuthorizationFilter jwtAuthorizationFilter() {
 		return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
 	}
 
@@ -69,7 +69,7 @@ public class WebSecurityConfig {
 			.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)))
 
-			.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
+			.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 
 		return http.build();
 	}
