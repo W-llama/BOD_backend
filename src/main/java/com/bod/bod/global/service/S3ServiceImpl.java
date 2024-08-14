@@ -63,7 +63,7 @@ public class S3ServiceImpl implements S3Service {
   }
 
   @Override
-  public String imageUpload(MultipartFile image, String key) {
+  public String imageUpload(MultipartFile image, String uniqueFileName) {
 	if (image.isEmpty()) {
 	  throw new GlobalException(ErrorCode.EMPTY_FILE);
 	}
@@ -73,8 +73,8 @@ public class S3ServiceImpl implements S3Service {
 	  ObjectMetadata metadata = new ObjectMetadata();
 	  metadata.setContentType(image.getContentType());
 	  metadata.setContentLength(image.getSize());
-	  amazonS3Client.putObject(BUCKET, key + image.getOriginalFilename(), image.getInputStream(), metadata);
-	  String imageUrl = amazonS3Client.getResourceUrl(BUCKET, key + image.getOriginalFilename());
+	  amazonS3Client.putObject(BUCKET, uniqueFileName, image.getInputStream(), metadata);
+	  String imageUrl = amazonS3Client.getResourceUrl(BUCKET, uniqueFileName);
 	  return imageUrl;
 	} catch (IOException e) {
 	  throw new FileUploadFailureException("파일 업로드 실패");
@@ -82,14 +82,14 @@ public class S3ServiceImpl implements S3Service {
   }
 
   @Override
-  public void deleteChallengeImage(Challenge challenge, String key) {
-	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, key + challenge.getImage());
+  public void deleteChallengeImage(Challenge challenge) {
+	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, challenge.getImage());
 	amazonS3Client.deleteObject(request);
   }
 
   @Override
-  public void deleteVerificationImage(Verification verification, String key) {
-	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, key + verification.getImageName());
+  public void deleteVerificationImage(Verification verification) {
+	DeleteObjectRequest request = new DeleteObjectRequest(BUCKET, verification.getImageName());
 	amazonS3Client.deleteObject(request);
   }
 
