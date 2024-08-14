@@ -10,11 +10,11 @@ import lombok.Setter;
 public class PointRankingResponseDto {
 
   private int rank;
-  private String nickName;
+  private String name;
   private long point;
 
-  public PointRankingResponseDto(String nickName, double score) {
-    this.nickName = nickName;
+  public PointRankingResponseDto(String name, double score) {
+    this.name = name;
     this.point = (long) score;
   }
 }
