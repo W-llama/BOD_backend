@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,8 +43,9 @@ public class VerificationService {
       duplicateVerification(challengeId, user);
 
       String key = "verification/";
-      String imageUrl = s3Service.imageUpload(image, key);
-      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), image.getOriginalFilename(), imageUrl, challenge, user);
+      String uniqueFileName = key + UUID.randomUUID() + "_" + image.getOriginalFilename();
+      String imageUrl = s3Service.imageUpload(image, uniqueFileName);
+      Verification verification = new Verification(requestDto.getTitle(), requestDto.getContent(), uniqueFileName, imageUrl, challenge, user);
       verificationRepository.save(verification);
       return new VerificationResponseDto(verification.getId(), verification.getTitle(), verification.getContent(), imageUrl, verification.getStatus());
   }
@@ -55,8 +57,7 @@ public class VerificationService {
       throw new GlobalException(ErrorCode.DO_NOT_CANCEL_VERIFICATION);
     }
     verification.checkUser(user);
-    String key = "verification/";
-    s3Service.deleteVerificationImage(verification, key);
+    s3Service.deleteVerificationImage(verification);
     verificationRepository.delete(verification);
   }
 
