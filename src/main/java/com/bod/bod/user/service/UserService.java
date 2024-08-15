@@ -1,8 +1,9 @@
 package com.bod.bod.user.service;
 
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
+import com.bod.bod.user.dto.EditIntroduceRequestDto;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
-import com.bod.bod.user.dto.EditProfileRequestDto;
+import com.bod.bod.user.dto.EditNickNameRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.PointRankingResponseDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
@@ -38,7 +39,10 @@ public interface UserService {
 	Map<String, Slice<ChallengeResponseDto>> getMyChallenges(User user, Pageable pageable);
 
 	@Transactional
-	UserResponseDto editProfile(EditProfileRequestDto profileRequestDto, User user);
+	UserResponseDto editNickName(EditNickNameRequestDto profileRequestDto, User user);
+
+	@Transactional
+	UserResponseDto editIntroduce(EditIntroduceRequestDto editIntroduceRequestDto, User user);
 
 	@Transactional
 	UserResponseDto editProfileImage(MultipartFile profileImage, User user);
