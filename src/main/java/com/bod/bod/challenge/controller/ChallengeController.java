@@ -99,4 +99,15 @@ public class ChallengeController {
 	return ResponseEntity.ok().body(new CommonResponseDto<>(
 		HttpStatus.OK.value(), "챌린지 top10 리스트 조회 성공", getTop10ChallengeList));
   }
+
+  @GetMapping("/search")
+  public ResponseEntity<CommonResponseDto<PaginationResponse<ChallengeSummaryResponseDto>>> getChallengesBySearch(
+	  @RequestParam(value = "title", required = false) String title,
+	  @RequestParam(value = "page", defaultValue = "0") int page,
+	  @RequestParam(value = "size", defaultValue = "9") int size
+  ) {
+	PaginationResponse<ChallengeSummaryResponseDto> challengeListBySearch = challengeService.getChallengesBySearch(title, page, size);
+	return ResponseEntity.ok().body(new CommonResponseDto<>(
+		HttpStatus.OK.value(), "챌린지 제목 검색결과 조회 성공", challengeListBySearch));
+  }
 }
