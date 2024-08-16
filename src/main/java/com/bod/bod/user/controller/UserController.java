@@ -3,8 +3,9 @@ package com.bod.bod.user.controller;
 import com.bod.bod.challenge.dto.ChallengeResponseDto;
 import com.bod.bod.global.dto.CommonResponseDto;
 import com.bod.bod.global.jwt.security.UserDetailsImpl;
+import com.bod.bod.user.dto.EditIntroduceRequestDto;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
-import com.bod.bod.user.dto.EditProfileRequestDto;
+import com.bod.bod.user.dto.EditNickNameRequestDto;
 import com.bod.bod.user.dto.PointRankingResponseDto;
 import com.bod.bod.user.dto.UserResponseDto;
 import com.bod.bod.user.service.UserService;
@@ -14,6 +15,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +49,7 @@ public class UserController {
 	}
 
 	@GetMapping("/users/{userId}")
-	public ResponseEntity<CommonResponseDto<UserResponseDto>> getUserprofile(
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getUserprofile (
 		@PathVariable(name = "userId") long userId
 	) {
 		UserResponseDto userResponseDto = userService.getUserprofile(userId);
@@ -56,7 +58,7 @@ public class UserController {
 	}
 
 	@GetMapping("/users/profile")
-	public ResponseEntity<CommonResponseDto<UserResponseDto>> getMyProfile(
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> getMyProfile (
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
 		UserResponseDto userResponseDto = userService.getMyProfile(userDetails.getUser());
@@ -64,14 +66,24 @@ public class UserController {
 			HttpStatus.OK.value(), "프로필 조회가 완료되었습니다.", userResponseDto));
 	}
 
-	@PutMapping("/users/profile")
-	public ResponseEntity<CommonResponseDto<UserResponseDto>> editProfile(
-		@RequestBody @Valid EditProfileRequestDto editProfileRequestDto,
+	@PutMapping("/users/profile/nickname")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> editNickName (
+		@RequestBody @Valid EditNickNameRequestDto editNickNameRequestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails
 	) {
-		UserResponseDto userResponseDto = userService.editProfile(editProfileRequestDto, userDetails.getUser());
+		UserResponseDto userResponseDto = userService.editNickName(editNickNameRequestDto, userDetails.getUser());
 		return ResponseEntity.ok().body(new CommonResponseDto<>(
-			HttpStatus.OK.value(), "회원정보 수정이 완료되었습니다.", userResponseDto));
+			HttpStatus.OK.value(), "닉네임 수정이 완료되었습니다.", userResponseDto));
+	}
+
+	@PutMapping("/users/profile/introduce")
+	public ResponseEntity<CommonResponseDto<UserResponseDto>> editIntroduce (
+		@RequestBody @Valid EditIntroduceRequestDto editIntroduceRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails
+	) {
+		UserResponseDto userResponseDto = userService.editIntroduce(editIntroduceRequestDto, userDetails.getUser());
+		return ResponseEntity.ok().body(new CommonResponseDto<>(
+			HttpStatus.OK.value(), "자기소개 수정이 완료되었습니다.", userResponseDto));
 	}
 
 	@PutMapping("/users/profile/password")
@@ -107,7 +119,7 @@ public class UserController {
 	@GetMapping("/users/profile/challenges")
 	public ResponseEntity<CommonResponseDto<Map<String, Slice<ChallengeResponseDto>>>> getMyChallenges(
 		@AuthenticationPrincipal UserDetailsImpl userDetails,
-		@PageableDefault Pageable pageable
+		@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
 		Map<String, Slice<ChallengeResponseDto>> challengeSlices = userService.getMyChallenges(userDetails.getUser(), pageable);
 		return ResponseEntity.ok().body(new CommonResponseDto<>(

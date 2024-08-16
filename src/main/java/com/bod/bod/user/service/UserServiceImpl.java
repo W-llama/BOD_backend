@@ -6,8 +6,9 @@ import com.bod.bod.global.exception.ErrorCode;
 import com.bod.bod.global.exception.GlobalException;
 import com.bod.bod.global.jwt.JwtUtil;
 import com.bod.bod.global.service.S3Service;
+import com.bod.bod.user.dto.EditIntroduceRequestDto;
 import com.bod.bod.user.dto.EditPasswordRequestDto;
-import com.bod.bod.user.dto.EditProfileRequestDto;
+import com.bod.bod.user.dto.EditNickNameRequestDto;
 import com.bod.bod.user.dto.LoginRequestDto;
 import com.bod.bod.user.dto.PointRankingResponseDto;
 import com.bod.bod.user.dto.SignUpRequestDto;
@@ -157,11 +158,19 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional
-  public UserResponseDto editProfile(EditProfileRequestDto profileRequestDto, User user) {
+  public UserResponseDto editNickName(EditNickNameRequestDto editNickNameRequestDto, User user) {
 	validateActiveUserStatus(user);
-	updateProfile(profileRequestDto, user);
+	updateNickName(editNickNameRequestDto, user);
 	userRepository.save(user);
 	return new UserResponseDto(user);
+  }
+
+  @Override
+  @Transactional
+  public UserResponseDto editIntroduce(EditIntroduceRequestDto editIntroduceRequestDto, User user) {
+	  updateIntroduce(editIntroduceRequestDto, user);
+	  userRepository.save(user);
+	  return new UserResponseDto(user);
   }
 
   @Override
@@ -311,18 +320,21 @@ public class UserServiceImpl implements UserService {
 	}
   }
 
-  private void validateWithdrawalRequest(String username, String password, User user) {
+  private void validateWithdrawalRequest (String username, String password, User user) {
 	validateUsernameRequest(username, user);
 	validateActiveUserStatus(user);
 	validateUserPassword(password, user.getPassword());
   }
 
-  private void updateProfile(EditProfileRequestDto profileRequestDto, User user) {
-	if (!profileRequestDto.getNickname().equals(user.getNickname())) {
-	  checkExistingNickname(profileRequestDto.getNickname());
-	  user.changeNickname(profileRequestDto.getNickname());
+  private void updateNickName (EditNickNameRequestDto editNickNameRequestDto, User user) {
+	if (!editNickNameRequestDto.getNickname().equals(user.getNickname())) {
+	  checkExistingNickname(editNickNameRequestDto.getNickname());
+	  user.changeNickname(editNickNameRequestDto.getNickname());
 	}
-	user.changeIntroduce(profileRequestDto.getIntroduce());
+  }
+
+  private void updateIntroduce(EditIntroduceRequestDto editIntroduceRequestDto, User user) {
+	  user.changeIntroduce(editIntroduceRequestDto.getIntroduce());
   }
 
   private void savePasswordHistory(User user, String password) {

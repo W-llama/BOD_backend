@@ -13,11 +13,11 @@ public interface S3Service {
   void deleteFromS3(String fileName);
 
   @Transactional
-  String imageUpload(MultipartFile image, String key);
+  String imageUpload(MultipartFile image, String uniqueFileName);
 
   @Transactional
-  void deleteChallengeImage(Challenge challenge, String key);
+  void deleteChallengeImage(Challenge challenge);
 
   @Transactional
-  void deleteVerificationImage(Verification verification, String key);
+  void deleteVerificationImage(Verification verification);
 }

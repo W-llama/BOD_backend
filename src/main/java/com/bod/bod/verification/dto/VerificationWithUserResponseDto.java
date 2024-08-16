@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VerificationWithUserResponseDto {
   private Long verificationId;
+  private Long userId;
   private String title;
   private String content;
   private String image;
@@ -15,6 +16,7 @@ public class VerificationWithUserResponseDto {
 
   public VerificationWithUserResponseDto(Verification verification) {
 	this.verificationId = verification.getId();
+	this.userId = verification.getUser().getId();
 	this.title = verification.getTitle();
 	this.content = verification.getContent();
 	this.image = verification.getImageUrl();
