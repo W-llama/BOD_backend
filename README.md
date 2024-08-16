@@ -64,28 +64,6 @@
 <div id="h">
 
 # 🗂️ API 명세서
-![스크린샷 2024-08-16 오후 6 15 00](https://github.com/user-attachments/assets/91033e8a-60df-4ad2-af96-b3e842b9a00f)
-![스크린샷 2024-08-16 오후 6 15 21](https://github.com/user-attachments/assets/eaaa2871-b05f-4518-b0bd-1431f4a319f2)
-![스크린샷 2024-08-16 오후 6 15 37](https://github.com/user-attachments/assets/2ff78361-8c81-4a2f-a9d9-227005c8fb00)
-![스크린샷 2024-08-16 오후 6 16 17](https://github.com/user-attachments/assets/aae4d444-9f69-4360-aceb-e377778c144d)
-![스크린샷 2024-08-16 오후 6 16 30](https://github.com/user-attachments/assets/02742043-5839-4ed3-bc89-cc7fd8db0ff5)
-![스크린샷 2024-08-16 오후 6 16 42](https://github.com/user-attachments/assets/6b97eade-2a71-40f5-81ff-4227ec801284)
-![스크린샷 2024-08-16 오후 6 16 57](https://github.com/user-attachments/assets/35ca3ae9-f41f-4e93-8804-1989f66c5744)
-![스크린샷 2024-08-16 오후 6 17 07](https://github.com/user-attachments/assets/46cb3678-3822-4e67-be82-dec669023d13)
-![스크린샷 2024-08-16 오후 6 17 19](https://github.com/user-attachments/assets/cbbdbced-8309-4a6e-8b14-53471da0bec4)
-![스크린샷 2024-08-16 오후 6 17 29](https://github.com/user-attachments/assets/48ca4696-014c-4ff4-b0b5-8414ec3f78cf)
-![스크린샷 2024-08-16 오후 6 17 46](https://github.com/user-attachments/assets/aa52ebc2-f519-4e96-ae5b-b3bff153c5fb)
-![스크린샷 2024-08-16 오후 6 17 54](https://github.com/user-attachments/assets/7b31d640-6717-437e-92d8-afa0b044eb66)
-![스크린샷 2024-08-16 오후 6 18 07](https://github.com/user-attachments/assets/d81b4f68-2464-4169-89bb-e66732915823)
-![스크린샷 2024-08-16 오후 6 18 21](https://github.com/user-attachments/assets/b82bba9c-845d-4fd7-a62a-40153aedba56)
-![스크린샷 2024-08-16 오후 6 18 33](https://github.com/user-attachments/assets/d5e5f047-803f-4bc0-83b9-d8a34317da77)
-![스크린샷 2024-08-16 오후 6 18 42](https://github.com/user-attachments/assets/2a1032bf-604d-40d4-b4ad-e59d8271360a)
-![스크린샷 2024-08-16 오후 6 18 52](https://github.com/user-attachments/assets/44143845-39fd-4856-bbe0-9c21126106a3)
-![스크린샷 2024-08-16 오후 6 19 03](https://github.com/user-attachments/assets/190980ff-fac6-4d4c-b8a7-7eb482487641)
-![스크린샷 2024-08-16 오후 6 19 16](https://github.com/user-attachments/assets/a5a3a1f1-edb9-4b27-ad81-767a08470f72)
-![스크린샷 2024-08-16 오후 6 19 29](https://github.com/user-attachments/assets/18460f3d-c3c7-426c-980e-451a1e03c02a)
-![스크린샷 2024-08-16 오후 6 19 46](https://github.com/user-attachments/assets/ffa0fc28-abd7-4200-b9cc-eb678c6cfcd7)
-![스크린샷 2024-08-16 오후 6 19 55](https://github.com/user-attachments/assets/77477e64-953c-41e5-ab64-e28551f75096)
 
 
 
