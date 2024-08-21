@@ -54,7 +54,7 @@
 
 # [📋서비스 아키텍처]
 
-![스크린샷 2024-08-20 115945](https://github.com/user-attachments/assets/6584b2e6-b40b-4ee5-a0a1-cc12f78bf864)
+![스크린샷 2024-08-20 오후 6 11 46 (1)](https://github.com/user-attachments/assets/2d074057-ae0f-4a95-b262-914f143d7207)
 
 
 <div id="g">
