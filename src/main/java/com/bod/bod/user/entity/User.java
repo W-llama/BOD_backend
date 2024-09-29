@@ -51,7 +51,7 @@ public class User extends TimeStamp {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
 
-    @Column(name = "userRole", nullable = false)
+    @Column(name = "user_role", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
