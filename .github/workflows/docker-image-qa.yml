@@ -1,65 +1,65 @@
-name: Deploy to EC2 and RDS
-
-on:
-  push:
-    branches: [ dev ]
-
-env:
-  DOCKER_IMAGE_TAG_NAME: backend
-
-jobs:
-  build-and-docker-push:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean build
-
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
-
-      - name: Login to Docker Hub using Access Token
-        run: echo "${{ secrets.QA_DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.QA_DOCKERHUB_USERNAME }} --password-stdin
-
-      - name: Push the Docker image
-        run: docker push ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-  deploy-to-ec2:
-    needs: build-and-docker-push
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.QA_EC2_HOST }}
-          username: ${{ secrets.QA_EC2_USER }}
-          key: ${{ secrets.QA_EC2_KEY }}
-          script: |
-            CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
-            
-            if [ ! -z "$CONTAINER_ID" ]; then
-              sudo docker stop $CONTAINER_ID
-              sudo docker rm $CONTAINER_ID
-            fi
-            
-            sudo docker pull ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
-            sudo docker run -d -p 8080:8080 \
-                -e DB_USERNAME=${{secrets.DB_USERNAME}} \
-                -e DB_PASSWORD=${{secrets.DB_PASSWORD}} \
-                -e DB_URL=${{ secrets.DB_URL }} \
-            ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+#name: Deploy to EC2 and RDS
+#
+#on:
+#  push:
+#    branches: [ dev ]
+#
+#env:
+#  DOCKER_IMAGE_TAG_NAME: backend
+#
+#jobs:
+#  build-and-docker-push:
+#    runs-on: ubuntu-22.04
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#
+#      - name: Build with Gradle
+#        run: ./gradlew clean build
+#
+#      - name: Build the Docker image
+#        run: docker build . --file Dockerfile --tag ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+#
+#      - name: Login to Docker Hub using Access Token
+#        run: echo "${{ secrets.QA_DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.QA_DOCKERHUB_USERNAME }} --password-stdin
+#
+#      - name: Push the Docker image
+#        run: docker push ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v3
+#
+#  deploy-to-ec2:
+#    needs: build-and-docker-push
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Deploy to EC2
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.QA_EC2_HOST }}
+#          username: ${{ secrets.QA_EC2_USER }}
+#          key: ${{ secrets.QA_EC2_KEY }}
+#          script: |
+#            CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080-8080")
+#
+#            if [ ! -z "$CONTAINER_ID" ]; then
+#              sudo docker stop $CONTAINER_ID
+#              sudo docker rm $CONTAINER_ID
+#            fi
+#
+#            sudo docker pull ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
+#            sudo docker run -d -p 8080:8080 \
+#                -e DB_USERNAME=${{secrets.DB_USERNAME}} \
+#                -e DB_PASSWORD=${{secrets.DB_PASSWORD}} \
+#                -e DB_URL=${{ secrets.DB_URL }} \
+#            ${{ secrets.QA_DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_TAG_NAME }}:latest
