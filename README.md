@@ -28,6 +28,8 @@
 * <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white"><img src="https://img.shields.io/badge/3.2.13-515151?style=for-the-badge">
 * <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
 * <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+* <img src="https://img.shields.io/badge/grafana-F46800?style=for-the-badge&logo=notion&logoColor=white">
+* <img src="https://img.shields.io/badge/prometheus-E6522C?style=for-the-badge&logo=notion&logoColor=white">
 
 <div id="c">
 
@@ -115,6 +117,11 @@ SMTP_PORT= {your_smtp_port}
 SMTP_USERNAME= {your_smtp_username}
 ```
 ---
+
+# 💻 모니터링 (grafana & prometheus)
+![스크린샷 2024-12-19 213131](https://github.com/user-attachments/assets/5f3845f6-d671-4858-8587-7069540302ab)
+
+
 
 
 

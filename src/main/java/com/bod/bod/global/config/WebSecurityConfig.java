@@ -52,6 +52,7 @@ public class WebSecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 설정 : STATELESS
 
 			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/actuator/**").permitAll()  // Prometheus 메트릭 접근 허용
 				.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/signup/**").permitAll()
@@ -81,7 +82,7 @@ public class WebSecurityConfig {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-					.allowedOrigins("http://localhost:8081", "http://frontend", "http://challengersbod.store", "https://challengersbod.store")
+					.allowedOrigins("http://localhost:8081")
 					.exposedHeaders("authorization") // 이 부분을 추가합니다.
 					.allowCredentials(true) // 쿠키 인증 요청 허용
 					.allowedHeaders("*")
