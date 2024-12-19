@@ -27,6 +27,10 @@ dependencies {
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    //prometheus 설정
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus' // 마이크로미터 프로메테우스 구현체
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // 엑츄에이터
+
     //JWT
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'

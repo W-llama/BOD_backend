@@ -52,6 +52,7 @@ public class WebSecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 설정 : STATELESS
 
 			.authorizeHttpRequests(authorize -> authorize
+				.requestMatchers("/actuator/**").permitAll()  // Prometheus 메트릭 접근 허용
 				.requestMatchers(HttpMethod.POST, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/signup/**").permitAll()

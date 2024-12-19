@@ -9,9 +9,7 @@ import com.bod.bod.user.entity.UserRole;
 import com.bod.bod.user.entity.UserStatus;
 import com.bod.bod.user.repository.UserRepository;
 import com.bod.bod.verification.repository.VerificationRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,6 +25,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AdminServiceTest {
 
     @Mock
@@ -89,11 +89,10 @@ class AdminServiceTest {
     }
 
     @Test
+    @Order(1)
     @DisplayName("전체 유저 조회 - 관리자 권한")
     void getAllUsers_asAdmin() {
         // Given
-
-        // Mocking the behavior of userRepository
         when(userRepository.findAllByOrderByCreatedAtAsc(any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(user1, user2)));
 
