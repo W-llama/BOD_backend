@@ -28,6 +28,8 @@
 * <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white"><img src="https://img.shields.io/badge/3.2.13-515151?style=for-the-badge">
 * <img src="https://img.shields.io/badge/slack-4A154B?style=for-the-badge&logo=slack&logoColor=white">
 * <img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
+* <img src="https://img.shields.io/badge/grafana-F46800?style=for-the-badge&logo=notion&logoColor=white">
+* <img src="https://img.shields.io/badge/prometheus-E6522C?style=for-the-badge&logo=notion&logoColor=white">
 
 <div id="c">
 
