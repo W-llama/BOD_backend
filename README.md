@@ -118,5 +118,10 @@ SMTP_USERNAME= {your_smtp_username}
 ```
 ---
 
+# 💻 모니터링 (grafana & prometheus)
+![스크린샷 2024-12-19 213131](https://github.com/user-attachments/assets/5f3845f6-d671-4858-8587-7069540302ab)
+
+
+
 
 
