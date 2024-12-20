@@ -46,7 +46,7 @@
 | 류승범 [팀장]                         | 김형석                         | 한해정                         | 김기남                         |
 |-------------------------------|-------------------------------|-------------------------------|-------------------------------|
 | [![류승범](https://github.com/W-llama.png)](https://github.com/W-llama) | [![김형석](https://github.com/Hyungs0703.png)](https://github.com/Hyungs0703) | [![한해정](https://github.com/HaejungHan.png)](https://github.com/HaejungHan) | [![김기남](https://github.com/kimankim0001.png)](https://github.com/kimankim0001) |
-|<br> - AWS 배포 <br> - 도커 CI/CD <br> - 챌린지 생성 |<br> - JWT 인증인가 <br> - 소셜로그인 <br> - Spring Security <br> - Front |<br> - http -> https <br> - 사용자 챌린지인증 CRUD <br> - Email 인증 <br> - 성능 최적화 <br> - Front |<br> - Admin 챌린지 CRUD <br> - 동시성 제어 <br> - Front |
+|<br> - AWS 배포 <br> - 도커 CI/CD <br> - 챌린지 생성 <br> - 모니터링시스템구축 |<br> - JWT 인증인가 <br> - 소셜로그인 <br> - Spring Security <br> - Front |<br> - http -> https <br> - 사용자 챌린지인증 CRUD <br> - Email 인증 <br> - 성능 최적화 <br> - Front |<br> - Admin 챌린지 CRUD <br> - 동시성 제어 <br> - Front |
 
 <div id="e">
   
