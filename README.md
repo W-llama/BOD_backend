@@ -56,7 +56,7 @@
 
 # [📋서비스 아키텍처]
 
-![스크린샷 2024-08-20 오후 6 11 46 (1)](https://github.com/user-attachments/assets/2d074057-ae0f-4a95-b262-914f143d7207)
+![bod](https://github.com/user-attachments/assets/db313ac9-ea9c-467b-82cb-03b1a492e940)
 
 
 <div id="g">
