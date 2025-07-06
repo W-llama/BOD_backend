@@ -66,7 +66,7 @@ public class ChallengeService {
 	return new PaginationResponse<>(
 		challengeList,
 		challenges.getTotalPages(),
-		challenges.getTotalPages(),
+		challenges.getTotalElements(),
 		challenges.getNumber(),
 		challenges.getSize()
 	);
@@ -146,7 +146,7 @@ public class ChallengeService {
 	}
 
 	List<ChallengeSummaryResponseDto> challengeList = challengeListBySearch.getContent().stream()
-		.map(challenge -> new ChallengeSummaryResponseDto(challenge)).toList();
+		.map(ChallengeSummaryResponseDto::new).toList();
 
 	return new PaginationResponse<>(
 		challengeList,
